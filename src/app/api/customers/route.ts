@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-admin';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 // GET /api/customers?phone=85997505422 - Find customer by phone
 export async function GET(request: NextRequest) {
@@ -7,7 +7,7 @@ export async function GET(request: NextRequest) {
     const phone = request.nextUrl.searchParams.get('phone');
     if (!phone) return NextResponse.json({ error: 'Phone required' }, { status: 400 });
 
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('customers')
       .select('*')
       .eq('phone', phone)
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
     const { phone, name, cep, street, number, neighborhood, city, state, complement } = body;
 
     // Check if customer exists
-    const { data: existing } = await supabaseAdmin
+    const { data: existing } = await getSupabaseAdmin()
       .from('customers')
       .select('id')
       .eq('phone', phone)
@@ -38,7 +38,7 @@ export async function POST(request: NextRequest) {
 
     if (existing) {
       // Update
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await getSupabaseAdmin()
         .from('customers')
         .update({ name, cep, street, number, neighborhood, city, state, complement })
         .eq('id', existing.id)
@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(data);
     } else {
       // Insert
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await getSupabaseAdmin()
         .from('customers')
         .insert([{ phone, name, cep, street, number, neighborhood, city, state, complement }])
         .select()

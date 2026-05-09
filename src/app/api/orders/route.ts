@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-admin';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 export async function POST(request: NextRequest) {
   try {
     const { customer_id, items, total_amount } = await request.json();
     if (!customer_id) return NextResponse.json({ error: 'customer_id required' }, { status: 400 });
 
-    const { data: order, error } = await supabaseAdmin
+    const { data: order, error } = await getSupabaseAdmin()
       .from('orders')
       .insert([{ customer_id, total_amount, status: 'pending' }])
       .select()
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
         quantity: i.quantity,
         price_at_time: i.price,
       }));
-      await supabaseAdmin.from('order_items').insert(orderItems);
+      await getSupabaseAdmin().from('order_items').insert(orderItems);
     }
 
     return NextResponse.json(order, { status: 201 });
@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
 
 export async function GET() {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('orders')
       .select('*, customers(name, phone), order_items(quantity, price_at_time, products(name))')
       .order('created_at', { ascending: false });

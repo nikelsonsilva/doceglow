@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-admin';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 export async function GET() {
   try {
-    const { data, error } = await supabaseAdmin
+    const { data, error } = await getSupabaseAdmin()
       .from('store_settings')
       .select('*')
       .limit(1)
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     const { id, ...payload } = body;
 
     if (id) {
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await getSupabaseAdmin()
         .from('store_settings')
         .update(payload)
         .eq('id', id)
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
       if (error) throw error;
       return NextResponse.json(data);
     } else {
-      const { data, error } = await supabaseAdmin
+      const { data, error } = await getSupabaseAdmin()
         .from('store_settings')
         .insert([payload])
         .select()

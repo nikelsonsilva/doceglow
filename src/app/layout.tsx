@@ -18,7 +18,16 @@ const playfair = Playfair_Display({
 
 export const metadata: Metadata = {
   title: "Doce Glow",
-  description: "Catálogo Online Doce Glow",
+  description: "Catálogo Online Doce Glow - Cosméticos e Beleza",
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
+  manifest: '/site.webmanifest',
 };
 
 export default function RootLayout({

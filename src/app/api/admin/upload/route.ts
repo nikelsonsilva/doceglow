@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-admin';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 const BUCKET = 'products';
 
@@ -13,10 +13,10 @@ export async function POST(request: NextRequest) {
     }
 
     // Ensure bucket exists
-    const { data: buckets } = await supabaseAdmin.storage.listBuckets();
+    const { data: buckets } = await getSupabaseAdmin().storage.listBuckets();
     const bucketExists = buckets?.some(b => b.name === BUCKET);
     if (!bucketExists) {
-      await supabaseAdmin.storage.createBucket(BUCKET, {
+      await getSupabaseAdmin().storage.createBucket(BUCKET, {
         public: true,
         fileSizeLimit: 10485760, // 10MB
       });
@@ -34,7 +34,7 @@ export async function POST(request: NextRequest) {
       const sanitizedName = `product_${timestamp}_${random}.${ext}`;
       const storagePath = `catalog/${sanitizedName}`;
 
-      const { error: uploadError } = await supabaseAdmin.storage
+      const { error: uploadError } = await getSupabaseAdmin().storage
         .from(BUCKET)
         .upload(storagePath, buffer, {
           contentType: file.type || 'image/jpeg',
@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
         continue;
       }
 
-      const { data: urlData } = supabaseAdmin.storage
+      const { data: urlData } = getSupabaseAdmin().storage
         .from(BUCKET)
         .getPublicUrl(storagePath);
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase-admin';
+import { getSupabaseAdmin } from '@/lib/supabase-admin';
 
 // GET /api/customers/orders?phone=85997505422
 export async function GET(request: NextRequest) {
@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
     if (!phone) return NextResponse.json({ error: 'Phone required' }, { status: 400 });
 
     // Find customer
-    const { data: customer } = await supabaseAdmin
+    const { data: customer } = await getSupabaseAdmin()
       .from('customers')
       .select('id')
       .eq('phone', phone)
@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     if (!customer) return NextResponse.json([]);
 
     // Fetch orders with items + product details
-    const { data: orders, error } = await supabaseAdmin
+    const { data: orders, error } = await getSupabaseAdmin()
       .from('orders')
       .select(`
         id, total_amount, status, created_at,
