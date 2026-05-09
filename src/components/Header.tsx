@@ -1,16 +1,28 @@
 'use client';
 
 import { useCartStore } from '@/store/useCartStore';
-import { ShoppingBag } from 'lucide-react';
+import { ShoppingBag, ClipboardList } from 'lucide-react';
 
-export default function Header() {
+interface HeaderProps {
+  onOpenOrders?: () => void;
+  hasOrders?: boolean;
+}
+
+export default function Header({ onOpenOrders, hasOrders }: HeaderProps) {
   const { items, toggleCart } = useCartStore();
   const itemCount = items.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
     <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-slate-100">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-        <div className="w-10"></div> {/* Spacer for centering */}
+        {/* Left: Meus Pedidos */}
+        <div className="w-10">
+          {hasOrders && onOpenOrders && (
+            <button onClick={onOpenOrders} className="p-2 text-slate-500 hover:text-primary transition-colors" title="Meus Pedidos">
+              <ClipboardList className="w-5 h-5" />
+            </button>
+          )}
+        </div>
         
         <h1 className="font-serif text-2xl font-bold text-primary tracking-tight">
           Doce Glow

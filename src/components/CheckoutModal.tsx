@@ -93,6 +93,10 @@ export default function CheckoutModal({ isOpen, onClose }: Props) {
       });
       if (!res.ok) { toast.error('Código inválido. Tente novamente.'); setLoading(false); return; }
 
+      // Save verified phone
+      localStorage.setItem('doceglow_phone', rawPhone);
+      window.dispatchEvent(new Event('doceglow:phone-verified'));
+
       // Check if customer exists in DB
       const custRes = await fetch(`/api/customers?phone=${rawPhone}`);
       const custData = await custRes.json();
@@ -172,7 +176,8 @@ export default function CheckoutModal({ isOpen, onClose }: Props) {
 
   // Final: send to WhatsApp
   const handleFinish = async () => {
-    const storePhone = settings.whatsapp_number || '5585997505422';
+    const rawStorePhone = (settings.whatsapp_number || '85997505422').replace(/\D/g, '');
+    const storePhone = rawStorePhone.startsWith('55') ? rawStorePhone : `55${rawStorePhone}`;
     const itemsText = items.map(i => `📦 ${i.quantity}x ${i.name} - R$ ${i.price.toFixed(2).replace('.',',')}`).join('%0A');
     const addr = customer?.street ? `${customer.street}, ${customer.number} - ${customer.neighborhood}, ${customer.city}/${customer.state} (CEP: ${customer.cep})` : 'Não informado';
 
@@ -271,6 +276,17 @@ export default function CheckoutModal({ isOpen, onClose }: Props) {
           {/* ===== ADDRESS ===== */}
           {step === 'address' && (
             <div className="space-y-4">
+              {/* Link back to saved address */}
+              {customer?.cep && useNewAddress && (
+                <button onClick={() => {
+                  setAddress({ cep: customer.cep!, street: customer.street || '', number: customer.number || '', neighborhood: customer.neighborhood || '', city: customer.city || '', state: customer.state || '', complement: customer.complement || '' });
+                  setUseNewAddress(false);
+                  setStep('confirm-address');
+                }}
+                  className="w-full flex items-center justify-center gap-2 py-2.5 text-sm text-primary font-medium bg-primary/5 rounded-xl hover:bg-primary/10 transition-colors">
+                  <MapPin className="w-4 h-4" /> Usar endereço cadastrado
+                </button>
+              )}
               <div className="flex items-center gap-3 mb-2 bg-primary/5 p-3 rounded-2xl">
                 <MapPin className="w-5 h-5 text-primary shrink-0" />
                 <p className="text-sm text-slate-600">Preencha seu CEP e completamos o restante.</p>

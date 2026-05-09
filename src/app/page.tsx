@@ -8,18 +8,25 @@ import ProductModal from '@/components/ProductModal';
 import CartDrawer from '@/components/CartDrawer';
 import CheckoutModal from '@/components/CheckoutModal';
 import FloatingCartBar from '@/components/FloatingCartBar';
+import OrdersDrawer from '@/components/OrdersDrawer';
 import { Product, useCartStore } from '@/store/useCartStore';
 
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState('Todos');
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  const [isOrdersOpen, setIsOrdersOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [categories, setCategories] = useState<string[]>(['Todos']);
   const [loading, setLoading] = useState(true);
+  const [customerPhone, setCustomerPhone] = useState<string | null>(null);
   const toggleCart = useCartStore(s => s.toggleCart);
 
   useEffect(() => {
+    // Load verified phone from localStorage
+    const saved = localStorage.getItem('doceglow_phone');
+    if (saved) setCustomerPhone(saved);
+
     async function loadProducts() {
       try {
         const res = await fetch('/api/products');
@@ -43,13 +50,27 @@ export default function Home() {
     loadProducts();
   }, []);
 
+  // Listen for phone verification events from CheckoutModal
+  useEffect(() => {
+    const handler = () => {
+      const saved = localStorage.getItem('doceglow_phone');
+      if (saved) setCustomerPhone(saved);
+    };
+    window.addEventListener('storage', handler);
+    window.addEventListener('doceglow:phone-verified', handler);
+    return () => {
+      window.removeEventListener('storage', handler);
+      window.removeEventListener('doceglow:phone-verified', handler);
+    };
+  }, []);
+
   const filteredProducts = activeCategory === 'Todos'
     ? products
     : products.filter(p => p.category === activeCategory);
 
   return (
     <div className="min-h-full flex flex-col bg-slate-50 pb-20">
-      <Header />
+      <Header onOpenOrders={() => setIsOrdersOpen(true)} hasOrders={!!customerPhone} />
       
       <main className="flex-1 w-full max-w-4xl mx-auto flex flex-col">
         <CategoryNav 
@@ -96,6 +117,12 @@ export default function Home() {
       <CheckoutModal 
         isOpen={isCheckoutOpen} 
         onClose={() => setIsCheckoutOpen(false)} 
+      />
+
+      <OrdersDrawer
+        isOpen={isOrdersOpen}
+        onClose={() => setIsOrdersOpen(false)}
+        customerPhone={customerPhone}
       />
 
       <FloatingCartBar onOpenCart={toggleCart} />
