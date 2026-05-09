@@ -43,3 +43,22 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const { id, status } = await request.json();
+    if (!id || !status) return NextResponse.json({ error: 'id and status required' }, { status: 400 });
+
+    const { data, error } = await getSupabaseAdmin()
+      .from('orders')
+      .update({ status })
+      .eq('id', id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return NextResponse.json(data);
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}

@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 
 export default function AdminOrders() {
@@ -11,12 +10,9 @@ export default function AdminOrders() {
   const loadOrders = async () => {
     try {
       setLoading(true);
-      const { data, error } = await supabase
-        .from('orders')
-        .select('*, customers(*)')
-        .order('created_at', { ascending: false });
-      
-      if (error) throw error;
+      const res = await fetch('/api/orders');
+      if (!res.ok) throw new Error('Failed to fetch orders');
+      const data = await res.json();
       setOrders(data || []);
     } catch (error) {
       console.error('Error loading orders:', error);
@@ -32,12 +28,12 @@ export default function AdminOrders() {
 
   const updateStatus = async (id: string, newStatus: string) => {
     try {
-      const { error } = await supabase
-        .from('orders')
-        .update({ status: newStatus })
-        .eq('id', id);
-      
-      if (error) throw error;
+      const res = await fetch('/api/orders', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, status: newStatus }),
+      });
+      if (!res.ok) throw new Error('Failed');
       toast.success('Status do pedido atualizado!');
       loadOrders();
     } catch (error) {
