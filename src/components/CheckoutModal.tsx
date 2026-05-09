@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useCartStore } from '@/store/useCartStore';
 import { Check, Copy, ArrowRight, Loader2, X, MapPin, Wallet, MessageCircle, User, RotateCcw, Minus, Plus, ShoppingBag, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { saveSession, getSessionPhone } from '@/lib/session';
 
 type Step = 'phone' | 'otp' | 'name' | 'address' | 'confirm-address' | 'review' | 'payment';
 
@@ -46,6 +47,13 @@ export default function CheckoutModal({ isOpen, onClose }: Props) {
       fetch('/api/admin/settings').then(r => r.json()).then(d => {
         if (d && !d.error) setSettings({ whatsapp_number: d.whatsapp_number || '', pix_key: d.pix_key || '' });
       }).catch(() => {});
+
+      // Auto-login: if session is valid, skip phone/OTP
+      const savedPhone = getSessionPhone();
+      if (savedPhone && step === 'phone') {
+        setPhone(formatPhone(savedPhone));
+        autoLoginCustomer(savedPhone);
+      }
     }
   }, [isOpen]);
 
@@ -58,6 +66,33 @@ export default function CheckoutModal({ isOpen, onClose }: Props) {
   if (!isOpen) return null;
 
   const rawPhone = stripPhone(phone);
+
+  // Auto-login for returning customers with valid session
+  const autoLoginCustomer = async (phoneNum: string) => {
+    setLoading(true);
+    try {
+      const custRes = await fetch(`/api/customers?phone=${phoneNum}`);
+      const custData = await custRes.json();
+
+      if (custData && custData.id) {
+        setCustomer(custData);
+        setFullName(custData.name || '');
+        if (custData.cep) {
+          setAddress({ cep: custData.cep, street: custData.street || '', number: custData.number || '', neighborhood: custData.neighborhood || '', city: custData.city || '', state: custData.state || '', complement: custData.complement || '' });
+          setStep('confirm-address');
+        } else {
+          setStep('address');
+        }
+      } else {
+        // Session exists but no customer in DB — reset to phone step
+        setStep('phone');
+      }
+    } catch {
+      setStep('phone');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Step 1: Send OTP
   const handleSendOtp = async () => {
@@ -93,8 +128,8 @@ export default function CheckoutModal({ isOpen, onClose }: Props) {
       });
       if (!res.ok) { toast.error('Código inválido. Tente novamente.'); setLoading(false); return; }
 
-      // Save verified phone
-      localStorage.setItem('doceglow_phone', rawPhone);
+      // Save verified phone with 7-day session
+      saveSession(rawPhone);
       window.dispatchEvent(new Event('doceglow:phone-verified'));
 
       // Check if customer exists in DB

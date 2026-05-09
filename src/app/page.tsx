@@ -10,6 +10,7 @@ import CheckoutModal from '@/components/CheckoutModal';
 import FloatingCartBar from '@/components/FloatingCartBar';
 import OrdersDrawer from '@/components/OrdersDrawer';
 import { Product, useCartStore } from '@/store/useCartStore';
+import { getSessionPhone, refreshSession } from '@/lib/session';
 
 export default function Home() {
   const [activeCategory, setActiveCategory] = useState('Todos');
@@ -23,9 +24,12 @@ export default function Home() {
   const toggleCart = useCartStore(s => s.toggleCart);
 
   useEffect(() => {
-    // Load verified phone from localStorage
-    const saved = localStorage.getItem('doceglow_phone');
-    if (saved) setCustomerPhone(saved);
+    // Load verified phone from session (7-day expiration)
+    const saved = getSessionPhone();
+    if (saved) {
+      setCustomerPhone(saved);
+      refreshSession(); // Extend session on visit
+    }
 
     async function loadProducts() {
       try {
@@ -53,7 +57,7 @@ export default function Home() {
   // Listen for phone verification events from CheckoutModal
   useEffect(() => {
     const handler = () => {
-      const saved = localStorage.getItem('doceglow_phone');
+      const saved = getSessionPhone();
       if (saved) setCustomerPhone(saved);
     };
     window.addEventListener('storage', handler);
