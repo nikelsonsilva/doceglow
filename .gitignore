@@ -39,3 +39,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# product photos & catalog (large files)
+fotos_produtos/
+*.pdf
+
+# test scripts
+test-pg.js
+run-node.js
