@@ -1,7 +1,7 @@
 'use client';
 
 import { useCartStore } from '@/store/useCartStore';
-import { ShoppingBag, ClipboardList } from 'lucide-react';
+import { ShoppingBag, History } from 'lucide-react';
 
 interface HeaderProps {
   onOpenOrders?: () => void;
@@ -24,7 +24,7 @@ export default function Header({ onOpenOrders, hasOrders }: HeaderProps) {
         <div className="flex items-center gap-1">
           {hasOrders && onOpenOrders && (
             <button onClick={onOpenOrders} className="p-2 text-slate-500 hover:text-primary transition-colors" title="Meus Pedidos">
-              <ClipboardList className="w-5 h-5" />
+              <History className="w-5 h-5" />
             </button>
           )}
           <button 
