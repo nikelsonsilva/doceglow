@@ -38,7 +38,7 @@ export default function CategoryNav({ categories, activeCategory, onSelectCatego
   };
 
   return (
-    <div className="w-full relative py-3 px-4 border-b border-slate-100 bg-white sticky top-0 z-20">
+    <div className="w-full relative py-3 px-4 border-b border-slate-100 bg-white/95 backdrop-blur-md sticky top-16 z-30">
       {/* Left arrow */}
       {showLeft && (
         <button onClick={() => scroll('left')}
