@@ -6,7 +6,10 @@ import { createClient } from '@supabase/supabase-js';
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request: { headers: request.headers } });
 
-  if (!request.nextUrl.pathname.startsWith('/admin')) return response;
+  const isAdminPage = request.nextUrl.pathname.startsWith('/admin');
+  const isAdminApi = request.nextUrl.pathname.startsWith('/api/admin');
+  
+  if (!isAdminPage && !isAdminApi) return response;
 
   // Auth client (with cookies to read user session)
   const supabase = createServerClient(
@@ -27,6 +30,7 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
+    if (isAdminApi) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
@@ -45,6 +49,7 @@ export async function middleware(request: NextRequest) {
     .single();
 
   if (!profile?.is_admin) {
+    if (isAdminApi) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     const url = request.nextUrl.clone();
     url.pathname = '/';
     return NextResponse.redirect(url);
@@ -54,5 +59,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin/:path*', '/api/admin/:path*'],
 };
