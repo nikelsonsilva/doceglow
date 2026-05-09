@@ -178,7 +178,7 @@ export default function CheckoutModal({ isOpen, onClose }: Props) {
   const handleFinish = async () => {
     const rawStorePhone = (settings.whatsapp_number || '85997505422').replace(/\D/g, '');
     const storePhone = rawStorePhone.startsWith('55') ? rawStorePhone : `55${rawStorePhone}`;
-    const itemsText = items.map(i => `📦 ${i.quantity}x ${i.name} - R$ ${i.price.toFixed(2).replace('.',',')}`).join('%0A');
+    const itemsText = items.map(i => `📦 ${i.quantity}x ${i.name} - R$ ${i.price.toFixed(2).replace('.',',')}`).join('\n');
     const addr = customer?.street ? `${customer.street}, ${customer.number} - ${customer.neighborhood}, ${customer.city}/${customer.state} (CEP: ${customer.cep})` : 'Não informado';
 
     // Save order via API
@@ -190,8 +190,22 @@ export default function CheckoutModal({ isOpen, onClose }: Props) {
       }).catch(() => {});
     } catch {}
 
-    const msg = `*NOVO PEDIDO - DOCE GLOW!* 🛍️%0A%0A*Cliente:* ${customer?.name}%0A*Telefone:* ${formatPhone(rawPhone)}%0A*Endereço:* ${addr}%0A%0A*ITENS:*%0A${itemsText}%0A%0A*TOTAL:* R$ ${total.toFixed(2).replace('.',',')}%0A%0A✅ *O cliente informou que já realizou o PIX.*`;
-    window.open(`https://wa.me/${storePhone}?text=${msg}`, '_blank');
+    const msg = [
+      `*NOVO PEDIDO - DOCE GLOW!* 🛍️`,
+      ``,
+      `*Cliente:* ${customer?.name}`,
+      `*Telefone:* ${formatPhone(rawPhone)}`,
+      `*Endereço:* ${addr}`,
+      ``,
+      `*ITENS:*`,
+      itemsText,
+      ``,
+      `*TOTAL:* R$ ${total.toFixed(2).replace('.',',')}`,
+      ``,
+      `✅ *O cliente informou que já realizou o PIX.*`,
+    ].join('\n');
+
+    window.open(`https://wa.me/${storePhone}?text=${encodeURIComponent(msg)}`, '_blank');
     clearCart();
     onClose();
   };
