@@ -67,9 +67,11 @@ CREATE UNIQUE INDEX IF NOT EXISTS customers_store_phone_idx ON customers(store_i
 -- 8. RLS para stores
 ALTER TABLE stores ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Stores are publicly readable" ON stores;
 CREATE POLICY "Stores are publicly readable" ON stores
   FOR SELECT USING (active = true);
 
+DROP POLICY IF EXISTS "Owner can manage their store" ON stores;
 CREATE POLICY "Owner can manage their store" ON stores
   FOR ALL USING (owner_id = auth.uid());
 
