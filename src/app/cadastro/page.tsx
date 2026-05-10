@@ -6,6 +6,13 @@ import { useRouter } from 'next/navigation';
 import { Store, Loader2, ArrowLeft, Eye, EyeOff, CheckCircle2, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
+function formatPhoneMask(value: string): string {
+  const d = value.replace(/\D/g, '').slice(0, 11);
+  if (d.length <= 2) return d;
+  if (d.length <= 7) return `(${d.slice(0,2)}) ${d.slice(2)}`;
+  return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
+}
+
 const CATEGORIES = [
   { value: 'cosmeticos', label: '💄 Cosméticos' },
   { value: 'roupas', label: '👗 Roupas' },
@@ -235,9 +242,9 @@ export default function CadastroPage() {
               <label className="block text-sm font-semibold text-slate-700 mb-1.5">WhatsApp da Loja</label>
               <input
                 type="tel"
-                value={form.whatsapp_number}
-                onChange={e => update('whatsapp_number', e.target.value.replace(/\D/g, ''))}
-                placeholder="85999999999"
+                value={formatPhoneMask(form.whatsapp_number)}
+                onChange={e => update('whatsapp_number', e.target.value.replace(/\D/g, '').slice(0, 11))}
+                placeholder="(85) 99999-9999"
                 className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               />
               <p className="text-xs text-slate-400 mt-1">Os pedidos dos clientes serão enviados para este número.</p>

@@ -14,6 +14,7 @@ interface Product {
   image_url: string;
   images?: string[];
   active: boolean;
+  stock: number | null;
   created_at: string;
 }
 
@@ -61,6 +62,7 @@ export default function AdminProducts() {
   const [form, setForm] = useState({
     name: '', priceDisplay: '', category: 'Gloss e batons',
     description: '', image_url: '', imageUrls: [] as string[], active: true,
+    stockDisplay: '' as string,
   });
 
   const loadProducts = async () => {
@@ -86,10 +88,11 @@ export default function AdminProducts() {
         image_url: product.image_url,
         imageUrls: product.images || [product.image_url],
         active: product.active,
+        stockDisplay: product.stock !== null && product.stock !== undefined ? String(product.stock) : '',
       });
     } else {
       setEditingProduct(null);
-      setForm({ name: '', priceDisplay: '', category: 'Gloss e batons', description: '', image_url: '', imageUrls: [], active: true });
+      setForm({ name: '', priceDisplay: '', category: 'Gloss e batons', description: '', image_url: '', imageUrls: [], active: true, stockDisplay: '' });
     }
     setIsModalOpen(true);
   };
@@ -157,6 +160,7 @@ export default function AdminProducts() {
         category: form.category,
         image_url: form.image_url || form.imageUrls[0],
         active: form.active,
+        stock: form.stockDisplay.trim() === '' ? null : parseInt(form.stockDisplay, 10),
       };
       if (editingProduct) payload.id = editingProduct.id;
 
@@ -225,6 +229,7 @@ export default function AdminProducts() {
                   <th className="p-4 font-medium text-slate-500 text-xs uppercase tracking-wider">Produto</th>
                   <th className="p-4 font-medium text-slate-500 text-xs uppercase tracking-wider">Categoria</th>
                   <th className="p-4 font-medium text-slate-500 text-xs uppercase tracking-wider">Preço</th>
+                  <th className="p-4 font-medium text-slate-500 text-xs uppercase tracking-wider">Estoque</th>
                   <th className="p-4 font-medium text-slate-500 text-xs uppercase tracking-wider">Status</th>
                   <th className="p-4 font-medium text-slate-500 text-xs uppercase tracking-wider text-right">Ações</th>
                 </tr>
@@ -246,6 +251,17 @@ export default function AdminProducts() {
                     </td>
                     <td className="p-4"><span className="text-sm text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">{p.category}</span></td>
                     <td className="p-4 font-semibold text-slate-800">R$ {Number(p.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
+                    <td className="p-4">
+                      {p.stock === null || p.stock === undefined ? (
+                        <span className="text-xs text-slate-400">∞</span>
+                      ) : p.stock === 0 ? (
+                        <span className="text-xs font-semibold text-red-600 bg-red-50 px-2 py-0.5 rounded-full">Esgotado</span>
+                      ) : p.stock <= 5 ? (
+                        <span className="text-xs font-semibold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">{p.stock} un.</span>
+                      ) : (
+                        <span className="text-xs font-medium text-slate-600">{p.stock} un.</span>
+                      )}
+                    </td>
                     <td className="p-4">
                       <button onClick={() => toggleActive(p.id, p.active)}
                         className={`px-3 py-1 rounded-full text-xs font-semibold transition-colors ${p.active ? 'bg-emerald-100 text-emerald-700 hover:bg-emerald-200' : 'bg-slate-100 text-slate-500 hover:bg-slate-200'}`}>
@@ -344,6 +360,16 @@ export default function AdminProducts() {
                   </div>
                 )}
                 <p className="text-xs text-slate-400 mt-2">Clique numa imagem para definir como principal. As imagens são comprimidas automaticamente.</p>
+              </div>
+
+              {/* Estoque */}
+              <div>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Estoque</label>
+                <input type="number" min="0" value={form.stockDisplay}
+                  onChange={e => setForm(f => ({ ...f, stockDisplay: e.target.value }))}
+                  placeholder="Deixe vazio para ilimitado"
+                  className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all" />
+                <p className="text-xs text-slate-400 mt-1">Vazio = sem controle de estoque. Zero = esgotado.</p>
               </div>
 
               {/* Status */}

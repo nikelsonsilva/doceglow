@@ -140,6 +140,21 @@ CREATE POLICY "Order items insertable publicly" ON order_items
 -- 13. Adicionar display_name no profiles
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS display_name TEXT;
 
+-- 14. Adicionar controle de estoque
+-- NULL = estoque ilimitado, número = estoque controlado
+ALTER TABLE products ADD COLUMN IF NOT EXISTS stock INTEGER DEFAULT NULL;
+
+-- 15. Função para decremento atômico de estoque
+-- Só decrementa se stock NÃO for NULL (estoque controlado)
+CREATE OR REPLACE FUNCTION decrement_stock(p_product_id UUID, p_quantity INTEGER)
+RETURNS VOID AS $$
+BEGIN
+  UPDATE products
+  SET stock = GREATEST(stock - p_quantity, 0)
+  WHERE id = p_product_id AND stock IS NOT NULL;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- PRONTO! Verificar:
 -- SELECT * FROM stores;
 -- SELECT COUNT(*), store_id FROM products GROUP BY store_id;

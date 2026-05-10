@@ -5,6 +5,17 @@ import { useParams } from 'next/navigation';
 import { toast } from 'sonner';
 import { Save, Loader2, ExternalLink, Copy } from 'lucide-react';
 
+function formatPhoneMask(value: string): string {
+  const d = value.replace(/\D/g, '').slice(0, 11);
+  if (d.length <= 2) return d;
+  if (d.length <= 7) return `(${d.slice(0,2)}) ${d.slice(2)}`;
+  return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
+}
+
+function stripPhone(value: string): string {
+  return value.replace(/\D/g, '');
+}
+
 export default function StoreAdminSettings() {
   const { slug } = useParams<{ slug: string }>();
   const [loading, setLoading] = useState(true);
@@ -123,9 +134,9 @@ export default function StoreAdminSettings() {
           <label className="block text-sm font-medium text-slate-700 mb-1.5">WhatsApp (com DDD)</label>
           <input
             type="tel"
-            value={form.whatsapp_number}
-            onChange={e => setForm(f => ({ ...f, whatsapp_number: e.target.value }))}
-            placeholder="85999999999"
+            value={formatPhoneMask(form.whatsapp_number)}
+            onChange={e => setForm(f => ({ ...f, whatsapp_number: stripPhone(e.target.value) }))}
+            placeholder="(85) 99999-9999"
             className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary"
           />
         </div>

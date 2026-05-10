@@ -5,8 +5,9 @@ import { getSupabaseAdmin } from '@/lib/supabase-admin';
 export async function POST(request: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
     const { slug } = await params;
+    const supabase = getSupabaseAdmin();
 
-    const { data: store } = await getSupabaseAdmin()
+    const { data: store } = await supabase
       .from('stores')
       .select('id')
       .eq('slug', slug)
@@ -17,7 +18,28 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
     const { customer_id, items, total_amount } = await request.json();
     if (!customer_id) return NextResponse.json({ error: 'customer_id required' }, { status: 400 });
 
-    const { data: order, error } = await getSupabaseAdmin()
+    // Validate stock before creating order
+    if (items?.length) {
+      const productIds = items.map((i: any) => i.id);
+      const { data: products } = await supabase
+        .from('products')
+        .select('id, name, stock')
+        .in('id', productIds);
+
+      if (products) {
+        for (const item of items) {
+          const prod = products.find((p: any) => p.id === item.id);
+          if (prod && prod.stock !== null && prod.stock < item.quantity) {
+            return NextResponse.json(
+              { error: `Estoque insuficiente para "${prod.name}". Disponível: ${prod.stock}` },
+              { status: 400 }
+            );
+          }
+        }
+      }
+    }
+
+    const { data: order, error } = await supabase
       .from('orders')
       .insert([{ customer_id, total_amount, status: 'pending', store_id: store.id }])
       .select()
@@ -32,7 +54,19 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         quantity: i.quantity,
         price_at_time: i.price,
       }));
-      await getSupabaseAdmin().from('order_items').insert(orderItems);
+      await supabase.from('order_items').insert(orderItems);
+
+      // Decrement stock for products that track it
+      for (const item of items) {
+        try {
+          await supabase.rpc('decrement_stock', {
+            p_product_id: item.id,
+            p_quantity: item.quantity,
+          });
+        } catch {
+          // Graceful: if RPC doesn't exist yet or stock is NULL, skip
+        }
+      }
     }
 
     return NextResponse.json(order, { status: 201 });

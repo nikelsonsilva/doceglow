@@ -8,6 +8,7 @@ export interface Product {
   image_url: string;
   images?: string[];
   active: boolean;
+  stock?: number | null;
 }
 
 export interface CartItem extends Product {
