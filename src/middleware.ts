@@ -5,11 +5,19 @@ import { createClient } from '@supabase/supabase-js';
 
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request: { headers: request.headers } });
+  const pathname = request.nextUrl.pathname;
 
-  const isAdminPage = request.nextUrl.pathname.startsWith('/admin');
-  const isAdminApi = request.nextUrl.pathname.startsWith('/api/admin');
+  // Match /{slug}/admin patterns
+  const adminMatch = pathname.match(/^\/([^/]+)\/admin/);
+  const apiAdminMatch = pathname.match(/^\/api\/stores\/([^/]+)\/(products|orders|customers)/);
   
-  if (!isAdminPage && !isAdminApi) return response;
+  // Only protect admin pages and write APIs
+  if (!adminMatch) return response;
+
+  const slug = adminMatch[1];
+  
+  // Skip non-admin slugs
+  if (['api', 'login', 'cadastro', '_next', 'favicon'].includes(slug)) return response;
 
   // Auth client (with cookies to read user session)
   const supabase = createServerClient(
@@ -30,26 +38,24 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    if (isAdminApi) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     const url = request.nextUrl.clone();
     url.pathname = '/login';
     return NextResponse.redirect(url);
   }
 
-  // Admin check using service_role (bypasses RLS)
+  // Check if user owns this store
   const adminClient = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!,
   );
 
-  const { data: profile } = await adminClient
-    .from('profiles')
-    .select('is_admin')
-    .eq('id', user.id)
+  const { data: store } = await adminClient
+    .from('stores')
+    .select('id, owner_id')
+    .eq('slug', slug)
     .single();
 
-  if (!profile?.is_admin) {
-    if (isAdminApi) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  if (!store || store.owner_id !== user.id) {
     const url = request.nextUrl.clone();
     url.pathname = '/';
     return NextResponse.redirect(url);
@@ -59,5 +65,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/api/admin/:path*'],
+  matcher: ['/:slug/admin/:path*'],
 };

@@ -27,9 +27,14 @@ function formatCep(v: string): string {
   return d.length > 5 ? `${d.slice(0,5)}-${d.slice(5)}` : d;
 }
 
-interface Props { isOpen: boolean; onClose: () => void; }
+interface Props { 
+  isOpen: boolean; 
+  onClose: () => void;
+  storeSlug?: string;
+  storeSettings?: { whatsapp_number: string; pix_key: string };
+}
 
-export default function CheckoutModal({ isOpen, onClose }: Props) {
+export default function CheckoutModal({ isOpen, onClose, storeSlug, storeSettings: extSettings }: Props) {
   const [step, setStep] = useState<Step>('phone');
   const [loading, setLoading] = useState(false);
   const [phone, setPhone] = useState('');
@@ -44,9 +49,14 @@ export default function CheckoutModal({ isOpen, onClose }: Props) {
 
   useEffect(() => {
     if (isOpen) {
-      fetch('/api/admin/settings').then(r => r.json()).then(d => {
-        if (d && !d.error) setSettings({ whatsapp_number: d.whatsapp_number || '', pix_key: d.pix_key || '' });
-      }).catch(() => {});
+      // Use external settings if provided (multitenant), else fetch from old endpoint
+      if (extSettings) {
+        setSettings(extSettings);
+      } else {
+        fetch('/api/admin/settings').then(r => r.json()).then(d => {
+          if (d && !d.error) setSettings({ whatsapp_number: d.whatsapp_number || '', pix_key: d.pix_key || '' });
+        }).catch(() => {});
+      }
 
       // Auto-login: if session is valid, skip phone/OTP
       const savedPhone = getSessionPhone();
@@ -71,7 +81,8 @@ export default function CheckoutModal({ isOpen, onClose }: Props) {
   const autoLoginCustomer = async (phoneNum: string) => {
     setLoading(true);
     try {
-      const custRes = await fetch(`/api/customers?phone=${phoneNum}`);
+      const apiBase = storeSlug ? `/api/stores/${storeSlug}` : '/api';
+      const custRes = await fetch(`${apiBase}/customers?phone=${phoneNum}`);
       const custData = await custRes.json();
 
       if (custData && custData.id) {
@@ -132,8 +143,8 @@ export default function CheckoutModal({ isOpen, onClose }: Props) {
       saveSession(rawPhone);
       window.dispatchEvent(new Event('doceglow:phone-verified'));
 
-      // Check if customer exists in DB
-      const custRes = await fetch(`/api/customers?phone=${rawPhone}`);
+      const apiBase = storeSlug ? `/api/stores/${storeSlug}` : '/api';
+      const custRes = await fetch(`${apiBase}/customers?phone=${rawPhone}`);
       const custData = await custRes.json();
 
       if (custData && custData.id) {
@@ -186,7 +197,8 @@ export default function CheckoutModal({ isOpen, onClose }: Props) {
     setLoading(true);
     try {
       const payload = { phone: rawPhone, name: customer?.name || fullName, ...address };
-      const res = await fetch('/api/customers', {
+      const apiBase = storeSlug ? `/api/stores/${storeSlug}` : '/api';
+      const res = await fetch(`${apiBase}/customers`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
@@ -218,7 +230,8 @@ export default function CheckoutModal({ isOpen, onClose }: Props) {
 
     // Save order via API
     try {
-      await fetch('/api/orders', {
+      const apiBase = storeSlug ? `/api/stores/${storeSlug}` : '/api';
+      await fetch(`${apiBase}/orders`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ customer_id: customer?.id, items, total_amount: total }),

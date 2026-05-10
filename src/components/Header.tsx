@@ -4,11 +4,12 @@ import { useCartStore } from '@/store/useCartStore';
 import { ShoppingBag, History } from 'lucide-react';
 
 interface HeaderProps {
+  storeName?: string;
   onOpenOrders?: () => void;
   hasOrders?: boolean;
 }
 
-export default function Header({ onOpenOrders, hasOrders }: HeaderProps) {
+export default function Header({ storeName, onOpenOrders, hasOrders }: HeaderProps) {
   const { items, toggleCart } = useCartStore();
   const itemCount = items.reduce((acc, item) => acc + item.quantity, 0);
 
@@ -17,8 +18,8 @@ export default function Header({ onOpenOrders, hasOrders }: HeaderProps) {
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="w-10"></div>
         
-        <h1 className="font-serif text-2xl font-bold text-primary tracking-tight">
-          Doce Glow
+        <h1 className="font-serif text-2xl font-bold text-primary tracking-tight truncate max-w-[200px]">
+          {storeName || 'Doce Glow'}
         </h1>
         
         <div className="flex items-center gap-1">

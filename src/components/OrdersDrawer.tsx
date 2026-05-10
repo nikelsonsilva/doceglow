@@ -23,6 +23,7 @@ interface Props {
   isOpen: boolean;
   onClose: () => void;
   customerPhone: string | null;
+  storeSlug?: string;
 }
 
 const statusMap: Record<string, { label: string; color: string }> = {
@@ -32,7 +33,7 @@ const statusMap: Record<string, { label: string; color: string }> = {
   cancelled: { label: 'Cancelado', color: 'bg-red-100 text-red-700' },
 };
 
-export default function OrdersDrawer({ isOpen, onClose, customerPhone }: Props) {
+export default function OrdersDrawer({ isOpen, onClose, customerPhone, storeSlug }: Props) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(false);
   const [expanded, setExpanded] = useState<string | null>(null);
@@ -41,7 +42,8 @@ export default function OrdersDrawer({ isOpen, onClose, customerPhone }: Props) 
   useEffect(() => {
     if (isOpen && customerPhone) {
       setLoading(true);
-      fetch(`/api/customers/orders?phone=${customerPhone}`)
+      const apiBase = storeSlug ? `/api/stores/${storeSlug}` : '/api';
+      fetch(`${apiBase}/customers/orders?phone=${customerPhone}`)
         .then(r => r.json())
         .then(data => { if (Array.isArray(data)) setOrders(data); })
         .catch(() => {})
