@@ -95,7 +95,9 @@ CREATE POLICY "Orders visible to store owner" ON orders
   );
 DROP POLICY IF EXISTS "Orders insertable publicly" ON orders;
 CREATE POLICY "Orders insertable publicly" ON orders
-  FOR INSERT WITH CHECK (true);
+  FOR INSERT WITH CHECK (
+    EXISTS (SELECT 1 FROM stores WHERE stores.id = store_id AND stores.active = true)
+  );
 DROP POLICY IF EXISTS "Owner manages orders" ON orders;
 CREATE POLICY "Owner manages orders" ON orders
   FOR UPDATE USING (
@@ -114,7 +116,9 @@ CREATE POLICY "Customers insertable publicly" ON customers
   FOR INSERT WITH CHECK (true);
 DROP POLICY IF EXISTS "Customers updatable publicly" ON customers;
 CREATE POLICY "Customers updatable publicly" ON customers
-  FOR UPDATE USING (true);
+  FOR UPDATE USING (
+    EXISTS (SELECT 1 FROM stores WHERE stores.id = customers.store_id AND stores.active = true)
+  );
 
 -- 12. RLS para order_items
 ALTER TABLE order_items ENABLE ROW LEVEL SECURITY;
@@ -129,7 +133,9 @@ CREATE POLICY "Order items visible to store owner" ON order_items
   );
 DROP POLICY IF EXISTS "Order items insertable publicly" ON order_items;
 CREATE POLICY "Order items insertable publicly" ON order_items
-  FOR INSERT WITH CHECK (true);
+  FOR INSERT WITH CHECK (
+    EXISTS (SELECT 1 FROM orders WHERE orders.id = order_id)
+  );
 
 -- 13. Adicionar display_name no profiles
 ALTER TABLE profiles ADD COLUMN IF NOT EXISTS display_name TEXT;

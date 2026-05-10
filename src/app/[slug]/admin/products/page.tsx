@@ -109,7 +109,7 @@ export default function AdminProducts() {
         const compressed = await compressImage(file);
         formData.append('files', new File([compressed], file.name, { type: 'image/jpeg' }));
       }
-      const res = await fetch('/api/admin/upload', { method: 'POST', body: formData });
+      const res = await fetch(`/api/stores/${slug}/upload`, { method: 'POST', body: formData });
       if (!res.ok) throw new Error('Upload falhou');
       const { urls } = await res.json();
       setForm(f => ({

@@ -31,12 +31,18 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     const { name, logo_url, primary_color, whatsapp_number, pix_key, category } = body;
 
+    // Validate hex color
+    const isValidColor = !primary_color || /^#([0-9A-Fa-f]{6})$/.test(primary_color);
+    if (!isValidColor) {
+      return NextResponse.json({ error: 'Cor inválida. Use formato hex (#FF00AA).' }, { status: 400 });
+    }
+
     const { data, error } = await getSupabaseAdmin()
       .from('stores')
       .update({ 
         ...(name && { name }),
         ...(logo_url !== undefined && { logo_url }),
-        ...(primary_color && { primary_color }),
+        ...(primary_color && isValidColor && { primary_color }),
         ...(whatsapp_number !== undefined && { whatsapp_number }),
         ...(pix_key !== undefined && { pix_key }),
         ...(category && { category }),

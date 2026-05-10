@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Store, Loader2, ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { Store, Loader2, ArrowLeft, Eye, EyeOff, CheckCircle2, XCircle } from 'lucide-react';
 import { toast } from 'sonner';
 
 const CATEGORIES = [
@@ -30,6 +30,35 @@ export default function CadastroPage() {
     category: '',
     whatsapp_number: '',
   });
+  const [slugStatus, setSlugStatus] = useState<{ available: boolean; slug: string; reason?: string } | null>(null);
+  const [checkingSlug, setCheckingSlug] = useState(false);
+  const slugTimer = useRef<NodeJS.Timeout | null>(null);
+
+  // Real-time slug availability check (debounced)
+  useEffect(() => {
+    if (slugTimer.current) clearTimeout(slugTimer.current);
+    setSlugStatus(null);
+
+    if (!form.store_name || form.store_name.length < 3) return;
+
+    setCheckingSlug(true);
+    slugTimer.current = setTimeout(async () => {
+      try {
+        const slug = form.store_name
+          .toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+          .replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '').slice(0, 40);
+        const res = await fetch(`/api/stores?slug=${slug}`);
+        const data = await res.json();
+        setSlugStatus(data);
+      } catch {
+        setSlugStatus(null);
+      } finally {
+        setCheckingSlug(false);
+      }
+    }, 500);
+
+    return () => { if (slugTimer.current) clearTimeout(slugTimer.current); };
+  }, [form.store_name]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -160,11 +189,23 @@ export default function CadastroPage() {
                 className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
               />
               {form.store_name && (
-                <p className="text-xs text-slate-400 mt-1.5">
-                  Sua loja ficará em: <span className="text-primary font-medium">
-                    doceglow.semfila.app/{form.store_name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').slice(0, 40)}
-                  </span>
-                </p>
+                <div className="mt-1.5 flex items-center gap-1.5">
+                  {checkingSlug ? (
+                    <><Loader2 className="w-3.5 h-3.5 animate-spin text-slate-400" /><span className="text-xs text-slate-400">Verificando...</span></>
+                  ) : slugStatus ? (
+                    slugStatus.available ? (
+                      <><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /><span className="text-xs text-emerald-600">Disponível: <span className="font-medium">doceglow.semfila.app/{slugStatus.slug}</span></span></>
+                    ) : (
+                      <><XCircle className="w-3.5 h-3.5 text-red-500" /><span className="text-xs text-red-500">{slugStatus.reason || 'Indisponível'}</span></>
+                    )
+                  ) : (
+                    <span className="text-xs text-slate-400">
+                      Sua loja ficará em: <span className="text-primary font-medium">
+                        doceglow.semfila.app/{form.store_name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').slice(0, 40)}
+                      </span>
+                    </span>
+                  )}
+                </div>
               )}
             </div>
 
