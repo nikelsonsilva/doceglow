@@ -1,19 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+
 import Link from 'next/link';
 import Image from 'next/image';
-import { useRouter } from 'next/navigation';
+
 import { Store, Zap, ShoppingBag, Palette, ArrowRight, Sparkles, Shield, Smartphone, ChevronRight } from 'lucide-react';
 
 export default function LandingPage() {
-  const router = useRouter();
-  const [email, setEmail] = useState('');
-
-  const handleCTA = (e: React.FormEvent) => {
-    e.preventDefault();
-    router.push(email ? `/cadastro?email=${encodeURIComponent(email)}` : '/cadastro');
-  };
 
   return (
     <div className="min-h-screen bg-white" style={{ fontFamily: "'Inter', sans-serif" }}>
@@ -46,37 +39,32 @@ export default function LandingPage() {
             
             {/* Left Content */}
             <div className="pt-32 pb-16 lg:pt-0 lg:pb-0 max-w-[520px]">
-              <p className="text-white/80 text-[15px] font-medium mb-3">
-                Crie sua loja virtual na Doce Glow
-              </p>
-              <h1 className="text-white text-[42px] md:text-[52px] leading-[1.08] font-bold mb-8 italic" style={{ fontFamily: 'var(--font-playfair), Georgia, serif' }}>
-                Ofereça a melhor experiência de compra
+              <span className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/15 text-white/90 px-4 py-1.5 rounded-full text-[13px] font-medium mb-6">
+                <Sparkles className="w-3.5 h-3.5" />
+                Plataforma 100% gratuita para começar
+              </span>
+              <h1 className="text-white text-[40px] md:text-[54px] leading-[1.06] font-bold mb-5" style={{ fontFamily: 'var(--font-playfair), Georgia, serif' }}>
+                Crie sua loja online em 2 minutos
               </h1>
-              
-              {/* Email CTA */}
-              <form onSubmit={handleCTA} className="flex items-center bg-white/10 backdrop-blur-sm rounded-full p-1.5 max-w-[440px] mb-4 border border-white/15">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={e => setEmail(e.target.value)}
-                  placeholder="nome@exemplo.com.br"
-                  className="flex-1 bg-transparent text-white placeholder:text-white/40 px-5 py-3 text-[15px] outline-none"
-                />
-                <button type="submit" className="bg-white text-[#0B2A8A] px-6 py-3 rounded-full text-[14px] font-bold whitespace-nowrap hover:bg-white/90 transition-all shrink-0">
-                  Criar loja grátis
-                </button>
-              </form>
-              <p className="text-white/50 text-[13px] mb-10">
-                Você não precisa de cartão de crédito para começar.
+              <p className="text-white/65 text-[17px] leading-relaxed mb-9 max-w-[440px]">
+                Catálogo de produtos, checkout via WhatsApp e painel de gestão. Tudo pronto para você vender mais.
               </p>
-
-              {/* Bottom banner */}
-              <div className="inline-flex items-center gap-2 bg-white/8 backdrop-blur-sm border border-white/12 rounded-full px-6 py-3">
-                <span className="text-white/70 text-[13px]">Já vende online?</span>
-                <Link href="/cadastro" className="text-white text-[13px] font-bold underline underline-offset-2 hover:text-white/90">
-                  Migre para a Doce Glow
+              
+              {/* CTA Buttons */}
+              <div className="flex flex-wrap items-center gap-4 mb-8">
+                <Link href="/cadastro" className="inline-flex items-center gap-2.5 bg-white text-[#0B2A8A] px-8 py-4 rounded-full text-[15px] font-bold hover:shadow-2xl hover:shadow-white/15 hover:scale-[1.02] transition-all">
+                  Criar Minha Loja
+                  <ArrowRight className="w-4.5 h-4.5" />
+                </Link>
+                <Link href="/doceglow" className="inline-flex items-center gap-2 text-white/80 hover:text-white text-[15px] font-medium transition-colors group">
+                  Ver exemplo
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </Link>
               </div>
+
+              <p className="text-white/40 text-[13px]">
+                Sem cartão de crédito · Cancele quando quiser
+              </p>
             </div>
 
             {/* Right Visual */}
