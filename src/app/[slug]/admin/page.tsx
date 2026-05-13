@@ -173,7 +173,7 @@ export default function StoreAdminSettings() {
         <button
           onClick={handleSave}
           disabled={saving}
-          className="w-full bg-primary text-white py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-60 transition-all shadow-md"
+          className="w-full bg-primary text-white py-3.5 rounded-xl font-semibold flex items-center justify-center gap-2 hover:opacity-90 disabled:opacity-60 transition shadow-md"
         >
           {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
           {saving ? 'Salvando...' : 'Salvar Configurações'}

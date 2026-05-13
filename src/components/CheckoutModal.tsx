@@ -258,8 +258,8 @@ export default function CheckoutModal({ isOpen, onClose, storeSlug, storeSetting
     onClose();
   };
 
-  const inputCls = "w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all";
-  const btnCls = "w-full bg-primary text-white py-4 rounded-full font-semibold flex items-center justify-center gap-2 hover:bg-primary-hover disabled:opacity-60 transition-all shadow-md shadow-pink-200";
+  const inputCls = "w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition";
+  const btnCls = "w-full bg-primary text-white py-4 rounded-full font-semibold flex items-center justify-center gap-2 hover:bg-primary-hover disabled:opacity-60 transition shadow-md shadow-pink-200";
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4">
@@ -326,7 +326,7 @@ export default function CheckoutModal({ isOpen, onClose, storeSlug, storeSetting
                 <p className="text-sm text-slate-500">Precisamos do seu nome completo para a entrega.</p>
               </div>
               <input value={fullName} onChange={e => setFullName(e.target.value)}
-                placeholder="Maria da Silva" autoFocus
+                placeholder="Maria da Silva" /* autoFocus removed for accessibility */
                 className={`${inputCls} text-center text-lg`} />
               <p className="text-xs text-slate-400 text-center">Obrigatório: nome e sobrenome</p>
               <button onClick={handleSaveName} disabled={fullName.trim().split(/\s+/).length < 2} className={btnCls}>
@@ -416,7 +416,7 @@ export default function CheckoutModal({ isOpen, onClose, storeSlug, storeSetting
                 ) : items.map(item => (
                   <div key={item.id} className="flex gap-3 bg-white p-3 rounded-xl border border-slate-100">
                     <div className="w-14 h-14 rounded-lg overflow-hidden bg-slate-100 shrink-0">
-                      <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
+                      <img loading="lazy" src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-medium text-slate-700 truncate">{item.name}</h4>

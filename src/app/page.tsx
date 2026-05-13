@@ -25,7 +25,7 @@ export default function LandingPage() {
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
               Login
             </Link>
-            <Link href="/cadastro" className="text-[14px] font-semibold text-[#0B2A8A] bg-white px-5 py-2.5 rounded-full hover:bg-white/90 transition-all">
+            <Link href="/cadastro" className="text-[14px] font-semibold text-[#0B2A8A] bg-white px-5 py-2.5 rounded-full hover:bg-white/90 transition">
               Criar loja grátis
             </Link>
           </div>
@@ -52,7 +52,7 @@ export default function LandingPage() {
               
               {/* CTA Buttons */}
               <div className="flex flex-wrap items-center gap-4 mb-8">
-                <Link href="/cadastro" className="inline-flex items-center gap-2.5 bg-white text-[#0B2A8A] px-8 py-4 rounded-full text-[15px] font-bold hover:shadow-2xl hover:shadow-white/15 hover:scale-[1.02] transition-all">
+                <Link href="/cadastro" className="inline-flex items-center gap-2.5 bg-white text-[#0B2A8A] px-8 py-4 rounded-full text-[15px] font-bold hover:shadow-2xl hover:shadow-white/15 hover:scale-[1.02] transition">
                   Criar Minha Loja
                   <ArrowRight className="w-4.5 h-4.5" />
                 </Link>
@@ -158,7 +158,7 @@ export default function LandingPage() {
                 bg: 'bg-violet-50',
               },
             ].map((feat, i) => (
-              <div key={i} className="group bg-white rounded-2xl border border-slate-100 p-7 hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
+              <div key={i} className="group bg-white rounded-2xl border border-slate-100 p-7 hover:shadow-xl hover:-translate-y-1 transition duration-300">
                 <div className={`w-14 h-14 rounded-2xl ${feat.bg} flex items-center justify-center mb-5 group-hover:scale-110 transition-transform`}>
                   <feat.icon className="w-6 h-6" style={{ color: feat.color }} />
                 </div>
@@ -177,7 +177,7 @@ export default function LandingPage() {
           <p className="text-slate-500 text-[15px] mb-12">Venda cosméticos, roupas, comida, artesanato e muito mais.</p>
           <div className="flex flex-wrap justify-center gap-3">
             {['💄 Cosméticos', '👗 Roupas', '🍰 Comida', '💎 Acessórios', '🧴 Perfumaria', '🎨 Artesanato', '📱 Eletrônicos', '🏠 Casa & Decoração'].map((cat, i) => (
-              <span key={i} className="bg-white border border-slate-200 px-6 py-3 rounded-full text-[14px] font-medium text-slate-600 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-default">
+              <span key={i} className="bg-white border border-slate-200 px-6 py-3 rounded-full text-[14px] font-medium text-slate-600 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition cursor-default">
                 {cat}
               </span>
             ))}
@@ -215,7 +215,7 @@ export default function LandingPage() {
           <p className="text-white/70 text-[17px] mb-10 max-w-lg mx-auto">
             Crie sua loja agora. É grátis, rápido e sem compromisso.
           </p>
-          <Link href="/cadastro" className="inline-flex items-center gap-2.5 bg-white text-[#0B2A8A] px-9 py-4 rounded-full text-[16px] font-bold hover:shadow-2xl hover:shadow-white/20 hover:scale-[1.02] transition-all">
+          <Link href="/cadastro" className="inline-flex items-center gap-2.5 bg-white text-[#0B2A8A] px-9 py-4 rounded-full text-[16px] font-bold hover:shadow-2xl hover:shadow-white/20 hover:scale-[1.02] transition">
             Começar Agora
             <ArrowRight className="w-5 h-5" />
           </Link>

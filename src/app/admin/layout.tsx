@@ -39,7 +39,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               <Link
                 key={item.href}
                 href={item.href}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm font-medium ${
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl transition text-sm font-medium ${
                   isActive
                     ? 'bg-primary/10 text-primary shadow-sm'
                     : 'hover:bg-slate-100 text-slate-600'
@@ -66,7 +66,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition-all min-w-[64px] ${
+              className={`flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-xl transition min-w-[64px] ${
                 isActive
                   ? 'text-primary'
                   : 'text-slate-400 hover:text-slate-600'

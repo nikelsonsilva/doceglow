@@ -69,7 +69,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
               {product.images && product.images.length > 0 ? (
                 <div className="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar">
                   {product.images.map((img, idx) => (
-                    <img 
+                    <img loading="lazy" 
                       key={idx}
                       src={img} 
                       alt={`${product.name} ${idx + 1}`}
@@ -79,7 +79,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
                   ))}
                 </div>
               ) : (
-                <img 
+                <img loading="lazy" 
                   src={product.image_url} 
                   alt={product.name}
                   className="w-full h-full object-cover cursor-zoom-in"
@@ -125,7 +125,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
           <div className="p-4 bg-white border-t border-slate-100 shadow-[0_-10px_20px_-10px_rgba(0,0,0,0.05)] pb-8 sm:pb-4 shrink-0">
             <button 
               onClick={handleAddToCart}
-              className="w-full bg-primary text-white py-4 rounded-full font-semibold shadow-md shadow-pink-200 hover:bg-primary-hover active:scale-[0.98] transition-all flex items-center justify-center gap-2"
+              className="w-full bg-primary text-white py-4 rounded-full font-semibold shadow-md shadow-pink-200 hover:bg-primary-hover active:scale-[0.98] transition flex items-center justify-center gap-2"
             >
               <ShoppingBag className="w-5 h-5" />
               Adicionar R$ {product.price.toFixed(2).replace('.', ',')}
@@ -144,7 +144,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
           >
             <X className="w-6 h-6" />
           </button>
-          <img 
+          <img loading="lazy" 
             src={fullscreenImage} 
             alt="Fullscreen view"
             className="w-full h-full object-contain"

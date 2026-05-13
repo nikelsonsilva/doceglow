@@ -240,7 +240,7 @@ export default function AdminProducts() {
                     <td className="p-4">
                       <div className="w-14 h-14 rounded-lg bg-slate-100 overflow-hidden shadow-sm">
                         {p.image_url ? (
-                          <img src={p.image_url} alt={p.name} className="w-full h-full object-cover" />
+                          <img loading="lazy" src={p.image_url} alt={p.name} className="w-full h-full object-cover" />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-slate-300"><ImageIcon className="w-5 h-5"/></div>
                         )}
@@ -296,7 +296,7 @@ export default function AdminProducts() {
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nome do Produto *</label>
                 <input type="text" required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                   placeholder="Ex: Batom Matte Hudamoji"
-                  className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all" />
+                  className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition" />
               </div>
 
               {/* Preço + Categoria */}
@@ -307,13 +307,13 @@ export default function AdminProducts() {
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium">R$</span>
                     <input type="text" required value={form.priceDisplay} onChange={handlePriceChange}
                       placeholder="0,00" inputMode="numeric"
-                      className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all" />
+                      className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition" />
                   </div>
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-1.5">Categoria *</label>
                   <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-                    className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary bg-white transition-all">
+                    className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary bg-white transition">
                     {ALL_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
@@ -324,7 +324,7 @@ export default function AdminProducts() {
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">Descrição</label>
                 <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                   rows={3} placeholder="Descreva o produto..."
-                  className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary resize-none transition-all" />
+                  className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary resize-none transition" />
               </div>
 
               {/* Imagens */}
@@ -332,11 +332,11 @@ export default function AdminProducts() {
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">Imagens do Produto</label>
                 <div className="flex gap-2 mb-3">
                   <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-dashed border-slate-300 rounded-xl text-sm text-slate-600 hover:border-primary hover:text-primary hover:bg-primary/5 transition-all disabled:opacity-50">
+                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-dashed border-slate-300 rounded-xl text-sm text-slate-600 hover:border-primary hover:text-primary hover:bg-primary/5 transition disabled:opacity-50">
                     {uploading ? <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</> : <><Upload className="w-4 h-4" /> Subir do PC/Celular</>}
                   </button>
                   <button type="button" onClick={addUrlManual}
-                    className="px-4 py-2.5 border-2 border-dashed border-slate-300 rounded-xl text-sm text-slate-600 hover:border-primary hover:text-primary hover:bg-primary/5 transition-all">
+                    className="px-4 py-2.5 border-2 border-dashed border-slate-300 rounded-xl text-sm text-slate-600 hover:border-primary hover:text-primary hover:bg-primary/5 transition">
                     <ImageIcon className="w-4 h-4" />
                   </button>
                 </div>
@@ -345,9 +345,9 @@ export default function AdminProducts() {
                 {form.imageUrls.length > 0 && (
                   <div className="grid grid-cols-4 gap-2">
                     {form.imageUrls.map((url, i) => (
-                      <div key={i} className={`relative group rounded-xl overflow-hidden aspect-square border-2 transition-all cursor-pointer ${form.image_url === url ? 'border-primary shadow-md' : 'border-transparent hover:border-slate-300'}`}
+                      <div key={i} className={`relative group rounded-xl overflow-hidden aspect-square border-2 transition cursor-pointer ${form.image_url === url ? 'border-primary shadow-md' : 'border-transparent hover:border-slate-300'}`}
                         onClick={() => setMainImage(i)}>
-                        <img src={url} alt="" className="w-full h-full object-cover" />
+                        <img loading="lazy" src={url} alt="" className="w-full h-full object-cover" />
                         {form.image_url === url && (
                           <div className="absolute bottom-0 left-0 right-0 bg-primary text-white text-[10px] text-center py-0.5 font-semibold">PRINCIPAL</div>
                         )}
@@ -368,7 +368,7 @@ export default function AdminProducts() {
                 <input type="number" min="0" value={form.stockDisplay}
                   onChange={e => setForm(f => ({ ...f, stockDisplay: e.target.value }))}
                   placeholder="Deixe vazio para ilimitado"
-                  className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition-all" />
+                  className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition" />
                 <p className="text-xs text-slate-400 mt-1">Vazio = sem controle de estoque. Zero = esgotado.</p>
               </div>
 
@@ -376,7 +376,7 @@ export default function AdminProducts() {
               <div className="flex items-center gap-3 pt-1">
                 <label className="relative inline-flex items-center cursor-pointer">
                   <input type="checkbox" checked={form.active} onChange={e => setForm(f => ({ ...f, active: e.target.checked }))} className="sr-only peer" />
-                  <div className="w-10 h-5 bg-slate-200 peer-focus:ring-2 peer-focus:ring-primary/30 rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-5 after:shadow-sm" />
+                  <div className="w-10 h-5 bg-slate-200 peer-focus:ring-2 peer-focus:ring-primary/30 rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition peer-checked:after:translate-x-5 after:shadow-sm" />
                 </label>
                 <span className="text-sm text-slate-600">{form.active ? 'Ativo (visível na loja)' : 'Inativo (oculto)'}</span>
               </div>

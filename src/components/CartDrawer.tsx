@@ -64,7 +64,7 @@ export default function CartDrawer({ onCheckout }: CartDrawerProps) {
               {items.map((item) => (
                 <div key={item.id} className="flex gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-100">
                   <div className="w-16 h-16 rounded-xl overflow-hidden bg-white shrink-0">
-                    <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
+                    <img loading="lazy" src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 flex flex-col justify-between">
                     <div>
@@ -111,7 +111,7 @@ export default function CartDrawer({ onCheckout }: CartDrawerProps) {
                 toggleCart();
                 onCheckout();
               }}
-              className="w-full bg-primary text-white py-4 rounded-full font-semibold shadow-md shadow-pink-200 hover:bg-primary-hover active:scale-[0.98] transition-all"
+              className="w-full bg-primary text-white py-4 rounded-full font-semibold shadow-md shadow-pink-200 hover:bg-primary-hover active:scale-[0.98] transition"
             >
               Avançar para Entrega
             </button>

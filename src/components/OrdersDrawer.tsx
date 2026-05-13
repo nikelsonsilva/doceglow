@@ -149,7 +149,7 @@ export default function OrdersDrawer({ isOpen, onClose, customerPhone, storeSlug
                           {order.order_items.map((item, idx) => (
                             <div key={idx} className="flex items-center gap-3">
                               <div className="w-10 h-10 rounded-lg overflow-hidden bg-white shrink-0 border border-slate-100">
-                                <img src={item.products?.image_url} alt={item.products?.name} className="w-full h-full object-cover" />
+                                <img loading="lazy" src={item.products?.image_url} alt={item.products?.name} className="w-full h-full object-cover" />
                               </div>
                               <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-slate-700 truncate">{item.products?.name}</p>

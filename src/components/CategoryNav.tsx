@@ -54,7 +54,7 @@ export default function CategoryNav({ categories, activeCategory, onSelectCatego
           <button
             key={category}
             onClick={() => onSelectCategory(category)}
-            className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition-all shrink-0 ${
+            className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition shrink-0 ${
               activeCategory === category
                 ? 'bg-primary text-white shadow-md shadow-pink-200'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200'

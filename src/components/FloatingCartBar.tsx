@@ -20,7 +20,7 @@ export default function FloatingCartBar({ onOpenCart }: FloatingCartBarProps) {
       <div className="max-w-md mx-auto pointer-events-auto">
         <button
           onClick={onOpenCart}
-          className="w-full bg-primary hover:bg-primary-hover text-white rounded-2xl px-5 py-4 flex items-center justify-between shadow-xl shadow-pink-200/50 transition-all active:scale-[0.98]"
+          className="w-full bg-primary hover:bg-primary-hover text-white rounded-2xl px-5 py-4 flex items-center justify-between shadow-xl shadow-pink-200/50 transition active:scale-[0.98]"
         >
           <div className="flex items-center gap-3">
             <div className="relative">

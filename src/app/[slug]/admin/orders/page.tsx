@@ -168,7 +168,7 @@ export default function AdminOrders() {
             const pendingCount = group.orders.filter(o => o.status === 'pending').length;
 
             return (
-              <div key={group.customerId} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition-all">
+              <div key={group.customerId} className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden transition">
                 {/* Customer Header - Clickable */}
                 <button
                   onClick={() => toggleCustomer(group.customerId)}

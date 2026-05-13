@@ -140,7 +140,7 @@ export default function CadastroPage() {
                 value={form.owner_name}
                 onChange={e => update('owner_name', e.target.value)}
                 placeholder="Maria Silva"
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
               />
             </div>
 
@@ -153,7 +153,7 @@ export default function CadastroPage() {
                 value={form.email}
                 onChange={e => update('email', e.target.value)}
                 placeholder="seu@email.com"
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
               />
             </div>
 
@@ -168,7 +168,7 @@ export default function CadastroPage() {
                   onChange={e => update('password', e.target.value)}
                   placeholder="Mínimo 6 caracteres"
                   minLength={6}
-                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all pr-12"
+                  className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition pr-12"
                 />
                 <button
                   type="button"
@@ -193,7 +193,7 @@ export default function CadastroPage() {
                 value={form.store_name}
                 onChange={e => update('store_name', e.target.value)}
                 placeholder="Ex: Maria Cosméticos"
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
               />
               {form.store_name && (
                 <div className="mt-1.5 flex items-center gap-1.5">
@@ -225,7 +225,7 @@ export default function CadastroPage() {
                     key={cat.value}
                     type="button"
                     onClick={() => update('category', cat.value)}
-                    className={`px-3 py-2.5 rounded-xl text-sm font-medium transition-all border-2 ${
+                    className={`px-3 py-2.5 rounded-xl text-sm font-medium transition border-2 ${
                       form.category === cat.value
                         ? 'border-primary bg-primary/5 text-primary shadow-sm'
                         : 'border-slate-100 bg-slate-50 text-slate-600 hover:border-slate-200'
@@ -245,7 +245,7 @@ export default function CadastroPage() {
                 value={formatPhoneMask(form.whatsapp_number)}
                 onChange={e => update('whatsapp_number', e.target.value.replace(/\D/g, '').slice(0, 11))}
                 placeholder="(85) 99999-9999"
-                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all"
+                className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition"
               />
               <p className="text-xs text-slate-400 mt-1">Os pedidos dos clientes serão enviados para este número.</p>
             </div>
@@ -254,7 +254,7 @@ export default function CadastroPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-pink-200 disabled:opacity-50 transition-all"
+              className="w-full bg-gradient-to-r from-pink-500 to-rose-500 text-white py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-pink-200 disabled:opacity-50 transition"
             >
               {loading ? (
                 <><Loader2 className="w-5 h-5 animate-spin" /> Criando sua loja...</>
