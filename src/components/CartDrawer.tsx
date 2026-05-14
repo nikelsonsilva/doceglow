@@ -62,33 +62,38 @@ export default function CartDrawer({ onCheckout }: CartDrawerProps) {
           ) : (
             <div className="flex flex-col gap-4">
               {items.map((item) => (
-                <div key={item.id} className="flex gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-100">
+                <div key={item.cartItemId} className="flex gap-3 bg-slate-50 p-3 rounded-2xl border border-slate-100">
                   <div className="w-16 h-16 rounded-xl overflow-hidden bg-white shrink-0">
                     <img loading="lazy" src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 flex flex-col justify-between">
                     <div>
                       <h4 className="text-sm font-medium text-slate-700 line-clamp-1">{item.name}</h4>
-                      <p className="text-xs text-slate-500 mt-0.5">R$ {item.price.toFixed(2).replace('.', ',')}</p>
+                      {item.selectedOptions?.length ? (
+                        <p className="text-[10px] text-slate-400 mt-0.5 line-clamp-2">
+                          {item.selectedOptions.map(s => s.options.join(', ')).join(' · ')}
+                        </p>
+                      ) : null}
+                      <p className="text-xs text-slate-500 mt-0.5">R$ {item.unitPrice.toFixed(2).replace('.', ',')}</p>
                     </div>
                     <div className="flex items-center justify-between mt-2">
                       <div className="flex items-center gap-3 bg-white border border-slate-200 rounded-full px-2 py-1">
                         <button 
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}
                           className="text-slate-400 hover:text-primary transition-colors"
                         >
                           <Minus className="w-3 h-3" />
                         </button>
                         <span className="text-xs font-semibold w-4 text-center">{item.quantity}</span>
                         <button 
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
                           className="text-slate-400 hover:text-primary transition-colors"
                         >
                           <Plus className="w-3 h-3" />
                         </button>
                       </div>
                       <span className="text-sm font-bold text-slate-800">
-                        R$ {(item.price * item.quantity).toFixed(2).replace('.', ',')}
+                        R$ {(item.unitPrice * item.quantity).toFixed(2).replace('.', ',')}
                       </span>
                     </div>
                   </div>

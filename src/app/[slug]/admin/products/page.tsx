@@ -2,8 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
-import { Plus, Edit, Trash2, X, Upload, Image as ImageIcon, Loader2 } from 'lucide-react';
+import { Plus, Edit, Trash2, X, Upload, Image as ImageIcon, Loader2, Layers } from 'lucide-react';
 import { toast } from 'sonner';
+import OptionGroupsEditor, { OptionGroup } from '@/components/admin/OptionGroupsEditor';
+import { storeHasOptionSupport, getCategorySuggestions } from '@/lib/store-features';
 
 interface Product {
   id: string;
@@ -15,13 +17,10 @@ interface Product {
   images?: string[];
   active: boolean;
   stock: number | null;
+  has_options?: boolean;
+  option_groups?: any[];
   created_at: string;
 }
-
-const ALL_CATEGORIES = [
-  'Gloss e batons', 'Máscaras', 'Sombras', 'Pó', 'Blush', 'Base',
-  'Contorno', 'Olhos', 'Skincare', 'Perfumaria', 'Acessórios', 'Kits'
-];
 
 function formatPriceBR(value: string): string {
   const digits = value.replace(/\D/g, '');
@@ -57,13 +56,27 @@ export default function AdminProducts() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [storeCategory, setStoreCategory] = useState<string>('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const isFood = storeHasOptionSupport(storeCategory);
+  const categorySuggestions = getCategorySuggestions(storeCategory);
+
   const [form, setForm] = useState({
-    name: '', priceDisplay: '', category: 'Gloss e batons',
+    name: '', priceDisplay: '', category: '',
     description: '', image_url: '', imageUrls: [] as string[], active: true,
     stockDisplay: '' as string,
+    optionGroups: [] as OptionGroup[],
   });
+
+  // Load store category
+  useEffect(() => {
+    if (!slug) return;
+    fetch(`/api/stores/${slug}`)
+      .then(r => r.json())
+      .then(d => { if (d?.category) setStoreCategory(d.category); })
+      .catch(() => {});
+  }, [slug]);
 
   const loadProducts = async () => {
     try {
@@ -80,6 +93,17 @@ export default function AdminProducts() {
   const openModal = (product?: Product) => {
     if (product) {
       setEditingProduct(product);
+      const groups: OptionGroup[] = (product.option_groups || []).map((g: any) => ({
+        name: g.name,
+        min_select: g.min_select,
+        max_select: g.max_select,
+        price_mode: g.price_mode || 'add',
+        sort_order: g.sort_order,
+        options: (g.product_options || g.options || []).map((o: any) => ({
+          name: o.name,
+          extra_price: Number(o.extra_price) || 0,
+        })),
+      }));
       setForm({
         name: product.name,
         priceDisplay: product.price.toLocaleString('pt-BR', { minimumFractionDigits: 2 }),
@@ -89,10 +113,15 @@ export default function AdminProducts() {
         imageUrls: product.images || [product.image_url],
         active: product.active,
         stockDisplay: product.stock !== null && product.stock !== undefined ? String(product.stock) : '',
+        optionGroups: groups,
       });
     } else {
       setEditingProduct(null);
-      setForm({ name: '', priceDisplay: '', category: 'Gloss e batons', description: '', image_url: '', imageUrls: [], active: true, stockDisplay: '' });
+      setForm({
+        name: '', priceDisplay: '', category: categorySuggestions[0] || '',
+        description: '', image_url: '', imageUrls: [], active: true, stockDisplay: '',
+        optionGroups: [],
+      });
     }
     setIsModalOpen(true);
   };
@@ -151,16 +180,33 @@ export default function AdminProducts() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.priceDisplay) { toast.error('Preencha nome e preço'); return; }
-    if (!form.imageUrls.length && !form.image_url) { toast.error('Adicione pelo menos uma imagem'); return; }
+
+    // Validate option groups
+    if (form.optionGroups.length > 0) {
+      for (const g of form.optionGroups) {
+        if (!g.name.trim()) { toast.error('Todas as etapas precisam ter um nome'); return; }
+        const validOpts = g.options.filter(o => o.name.trim());
+        if (validOpts.length === 0) { toast.error(`A etapa "${g.name}" precisa ter pelo menos uma opção`); return; }
+      }
+    }
+
     setSaving(true);
     try {
+      // Clean empty options
+      const cleanGroups = form.optionGroups.map(g => ({
+        ...g,
+        options: g.options.filter(o => o.name.trim()),
+      }));
+
       const payload: any = {
         name: form.name,
         price: parsePriceBR(form.priceDisplay),
         category: form.category,
-        image_url: form.image_url || form.imageUrls[0],
+        description: form.description || null,
+        image_url: form.image_url || form.imageUrls[0] || '',
         active: form.active,
         stock: form.stockDisplay.trim() === '' ? null : parseInt(form.stockDisplay, 10),
+        option_groups: cleanGroups.length > 0 ? cleanGroups : undefined,
       };
       if (editingProduct) payload.id = editingProduct.id;
 
@@ -202,14 +248,16 @@ export default function AdminProducts() {
     <div className="p-6 md:p-8 max-w-6xl mx-auto">
       <div className="flex justify-between items-center mb-8">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight">Produtos</h2>
+          <h2 className="text-3xl font-bold tracking-tight">
+            {isFood ? '🍽️ Cardápio' : 'Produtos'}
+          </h2>
           <p className="text-slate-500 mt-1">
-            {products.length} produto{products.length !== 1 ? 's' : ''} cadastrado{products.length !== 1 ? 's' : ''}
+            {products.length} {isFood ? 'item' : 'produto'}{products.length !== 1 ? 's' : ''} cadastrado{products.length !== 1 ? 's' : ''}
           </p>
         </div>
         <button onClick={() => openModal()}
           className="bg-primary hover:bg-primary-hover text-white px-5 py-2.5 rounded-xl font-medium flex items-center gap-2 transition-colors shadow-md shadow-pink-200">
-          <Plus className="w-5 h-5" /> Novo Produto
+          <Plus className="w-5 h-5" /> {isFood ? 'Novo Item' : 'Novo Produto'}
         </button>
       </div>
 
@@ -219,14 +267,16 @@ export default function AdminProducts() {
             <Loader2 className="w-5 h-5 animate-spin" /> Carregando...
           </div>
         ) : products.length === 0 ? (
-          <div className="p-12 text-center text-slate-400">Nenhum produto cadastrado.</div>
+          <div className="p-12 text-center text-slate-400">
+            {isFood ? 'Nenhum item no cardápio.' : 'Nenhum produto cadastrado.'}
+          </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
                 <tr className="border-b border-slate-200 bg-slate-50">
                   <th className="p-4 font-medium text-slate-500 text-xs uppercase tracking-wider">Imagem</th>
-                  <th className="p-4 font-medium text-slate-500 text-xs uppercase tracking-wider">Produto</th>
+                  <th className="p-4 font-medium text-slate-500 text-xs uppercase tracking-wider">{isFood ? 'Item' : 'Produto'}</th>
                   <th className="p-4 font-medium text-slate-500 text-xs uppercase tracking-wider">Categoria</th>
                   <th className="p-4 font-medium text-slate-500 text-xs uppercase tracking-wider">Preço</th>
                   <th className="p-4 font-medium text-slate-500 text-xs uppercase tracking-wider">Estoque</th>
@@ -248,6 +298,11 @@ export default function AdminProducts() {
                     </td>
                     <td className="p-4">
                       <p className="font-medium text-slate-800">{p.name}</p>
+                      {p.has_options && (
+                        <span className="inline-flex items-center gap-1 mt-1 text-xs text-amber-600 bg-amber-50 px-2 py-0.5 rounded-full">
+                          <Layers className="w-3 h-3" /> Montável
+                        </span>
+                      )}
                     </td>
                     <td className="p-4"><span className="text-sm text-slate-500 bg-slate-100 px-2.5 py-1 rounded-full">{p.category}</span></td>
                     <td className="p-4 font-semibold text-slate-800">R$ {Number(p.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</td>
@@ -286,35 +341,44 @@ export default function AdminProducts() {
           <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" />
           <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
             <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
-              <h3 className="text-xl font-bold text-slate-800">{editingProduct ? 'Editar Produto' : 'Novo Produto'}</h3>
+              <h3 className="text-xl font-bold text-slate-800">
+                {editingProduct ? (isFood ? 'Editar Item' : 'Editar Produto') : (isFood ? 'Novo Item do Cardápio' : 'Novo Produto')}
+              </h3>
               <button onClick={() => setIsModalOpen(false)} className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400"><X className="w-5 h-5" /></button>
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
               {/* Nome */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Nome do Produto *</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                  {isFood ? 'Nome do Item *' : 'Nome do Produto *'}
+                </label>
                 <input type="text" required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                  placeholder="Ex: Batom Matte Hudamoji"
+                  placeholder={isFood ? 'Ex: Macarronada Completa' : 'Ex: Batom Matte Hudamoji'}
                   className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition" />
               </div>
 
               {/* Preço + Categoria */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Preço *</label>
+                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                    {isFood ? 'Preço base *' : 'Preço *'}
+                  </label>
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium">R$</span>
                     <input type="text" required value={form.priceDisplay} onChange={handlePriceChange}
                       placeholder="0,00" inputMode="numeric"
                       className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition" />
                   </div>
+                  {isFood && form.optionGroups.length > 0 && (
+                    <p className="text-xs text-slate-400 mt-1">Preço base sem os extras das opções</p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-semibold text-slate-700 mb-1.5">Categoria *</label>
                   <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
                     className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary bg-white transition">
-                    {ALL_CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    {categorySuggestions.map(c => <option key={c} value={c}>{c}</option>)}
                   </select>
                 </div>
               </div>
@@ -323,13 +387,23 @@ export default function AdminProducts() {
               <div>
                 <label className="block text-sm font-semibold text-slate-700 mb-1.5">Descrição</label>
                 <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                  rows={3} placeholder="Descreva o produto..."
+                  rows={3} placeholder={isFood ? 'Ex: Macarronada artesanal feita na hora' : 'Descreva o produto...'}
                   className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary resize-none transition" />
               </div>
 
+              {/* ====== ETAPAS DE MONTAGEM (só para comida) ====== */}
+              {isFood && (
+                <div className="border-t border-slate-100 pt-5">
+                  <OptionGroupsEditor
+                    groups={form.optionGroups}
+                    onChange={(groups) => setForm(f => ({ ...f, optionGroups: groups }))}
+                  />
+                </div>
+              )}
+
               {/* Imagens */}
               <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Imagens do Produto</label>
+                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Imagens</label>
                 <div className="flex gap-2 mb-3">
                   <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
                     className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-dashed border-slate-300 rounded-xl text-sm text-slate-600 hover:border-primary hover:text-primary hover:bg-primary/5 transition disabled:opacity-50">
@@ -359,7 +433,7 @@ export default function AdminProducts() {
                     ))}
                   </div>
                 )}
-                <p className="text-xs text-slate-400 mt-2">Clique numa imagem para definir como principal. As imagens são comprimidas automaticamente.</p>
+                <p className="text-xs text-slate-400 mt-2">Clique numa imagem para definir como principal.</p>
               </div>
 
               {/* Estoque */}
@@ -389,7 +463,7 @@ export default function AdminProducts() {
                 </button>
                 <button type="submit" disabled={saving}
                   className="flex-1 px-4 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-hover transition-colors shadow-md shadow-pink-200 disabled:opacity-50 flex items-center justify-center gap-2">
-                  {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : 'Salvar Produto'}
+                  {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : (isFood ? 'Salvar Item' : 'Salvar Produto')}
                 </button>
               </div>
             </form>

@@ -225,7 +225,14 @@ export default function CheckoutModal({ isOpen, onClose, storeSlug, storeSetting
   const handleFinish = async () => {
     const rawStorePhone = (settings.whatsapp_number || '85997505422').replace(/\D/g, '');
     const storePhone = rawStorePhone.startsWith('55') ? rawStorePhone : `55${rawStorePhone}`;
-    const itemsText = items.map(i => `📦 ${i.quantity}x ${i.name} - R$ ${i.price.toFixed(2).replace('.',',')}`).join('\n');
+    const itemsText = items.map(i => {
+      let line = `📦 ${i.quantity}x ${i.name} - R$ ${i.unitPrice.toFixed(2).replace('.',',')}`;
+      if (i.selectedOptions?.length) {
+        const optDetails = i.selectedOptions.map(s => `  ↳ ${s.groupName}: ${s.options.join(', ')}`).join('\n');
+        line += '\n' + optDetails;
+      }
+      return line;
+    }).join('\n');
     const addr = customer?.street ? `${customer.street}, ${customer.number} - ${customer.neighborhood}, ${customer.city}/${customer.state} (CEP: ${customer.cep})` : 'Não informado';
 
     // Save order via API
@@ -414,26 +421,31 @@ export default function CheckoutModal({ isOpen, onClose, storeSlug, storeSetting
                     <p>Seu carrinho está vazio</p>
                   </div>
                 ) : items.map(item => (
-                  <div key={item.id} className="flex gap-3 bg-white p-3 rounded-xl border border-slate-100">
+                  <div key={item.cartItemId} className="flex gap-3 bg-white p-3 rounded-xl border border-slate-100">
                     <div className="w-14 h-14 rounded-lg overflow-hidden bg-slate-100 shrink-0">
                       <img loading="lazy" src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-medium text-slate-700 truncate">{item.name}</h4>
-                      <p className="text-xs text-slate-400 mt-0.5">R$ {item.price.toFixed(2).replace('.',',')} cada</p>
+                      {item.selectedOptions?.length ? (
+                        <p className="text-[10px] text-slate-400 mt-0.5 line-clamp-2">
+                          {item.selectedOptions.map(s => s.options.join(', ')).join(' · ')}
+                        </p>
+                      ) : null}
+                      <p className="text-xs text-slate-400 mt-0.5">R$ {item.unitPrice.toFixed(2).replace('.',',')} cada</p>
                       <div className="flex items-center justify-between mt-2">
                         <div className="flex items-center gap-2">
-                          <button onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          <button onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}
                             className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-red-50 hover:text-red-500 transition-colors">
                             {item.quantity === 1 ? <Trash2 className="w-3.5 h-3.5" /> : <Minus className="w-3.5 h-3.5" />}
                           </button>
                           <span className="text-sm font-semibold w-5 text-center">{item.quantity}</span>
-                          <button onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          <button onClick={() => updateQuantity(item.cartItemId, item.quantity + 1)}
                             className="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-primary/10 hover:text-primary transition-colors">
                             <Plus className="w-3.5 h-3.5" />
                           </button>
                         </div>
-                        <span className="text-sm font-bold text-slate-800">R$ {(item.price * item.quantity).toFixed(2).replace('.',',')}</span>
+                        <span className="text-sm font-bold text-slate-800">R$ {(item.unitPrice * item.quantity).toFixed(2).replace('.',',')}</span>
                       </div>
                     </div>
                   </div>
