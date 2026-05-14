@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
-import { Plus, Edit, Trash2, X, Upload, Image as ImageIcon, Loader2, Layers } from 'lucide-react';
+import { Plus, Edit, Trash2, X, Upload, Image as ImageIcon, Loader2, Layers, ChevronLeft, ChevronRight } from 'lucide-react';
 import { toast } from 'sonner';
 import OptionGroupsEditor, { OptionGroup } from '@/components/admin/OptionGroupsEditor';
 import { storeHasOptionSupport, getCategorySuggestions } from '@/lib/store-features';
@@ -57,6 +57,7 @@ export default function AdminProducts() {
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [storeCategory, setStoreCategory] = useState<string>('');
+  const [modalStep, setModalStep] = useState(0);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isFood = storeHasOptionSupport(storeCategory);
@@ -123,8 +124,12 @@ export default function AdminProducts() {
         optionGroups: [],
       });
     }
+    setModalStep(0);
     setIsModalOpen(true);
   };
+
+  const adminStepLabels = isFood ? ['Informações', 'Montagem', 'Mídia'] : ['Informações', 'Mídia'];
+  const adminTotalSteps = adminStepLabels.length;
 
   const handlePriceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.replace(/\D/g, '');
@@ -335,136 +340,167 @@ export default function AdminProducts() {
         )}
       </div>
 
-      {/* ====== MODAL ====== */}
+      {/* ====== MODAL WIZARD ====== */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setIsModalOpen(false)}>
           <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" />
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
-            <div className="sticky top-0 bg-white border-b border-slate-100 px-6 py-4 flex items-center justify-between rounded-t-2xl z-10">
-              <h3 className="text-xl font-bold text-slate-800">
-                {editingProduct ? (isFood ? 'Editar Item' : 'Editar Produto') : (isFood ? 'Novo Item do Cardápio' : 'Novo Produto')}
-              </h3>
-              <button onClick={() => setIsModalOpen(false)} className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400"><X className="w-5 h-5" /></button>
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 max-h-[90vh] flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
+            {/* Header with step progress */}
+            <div className="bg-white border-b border-slate-100 px-6 py-4 rounded-t-2xl shrink-0">
+              <div className="flex items-center justify-between mb-3">
+                <h3 className="text-lg font-bold text-slate-800">
+                  {editingProduct ? (isFood ? 'Editar Item' : 'Editar Produto') : (isFood ? 'Novo Item' : 'Novo Produto')}
+                </h3>
+                <button onClick={() => setIsModalOpen(false)} className="p-1.5 rounded-full hover:bg-slate-100 text-slate-400"><X className="w-5 h-5" /></button>
+              </div>
+              {/* Step indicators */}
+              <div className="flex items-center gap-2">
+                {adminStepLabels.map((label, i) => (
+                  <button key={i} type="button" onClick={() => setModalStep(i)}
+                    className={`flex-1 flex flex-col items-center gap-1 py-1 rounded-lg transition-colors ${
+                      i === modalStep ? '' : 'opacity-60 hover:opacity-80'
+                    }`}>
+                    <div className={`w-full h-1 rounded-full transition-colors ${
+                      i < modalStep ? 'bg-emerald-400' : i === modalStep ? 'bg-primary' : 'bg-slate-200'
+                    }`} />
+                    <span className={`text-[11px] font-medium ${
+                      i === modalStep ? 'text-primary' : 'text-slate-400'
+                    }`}>{label}</span>
+                  </button>
+                ))}
+              </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="p-6 space-y-5">
-              {/* Nome */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                  {isFood ? 'Nome do Item *' : 'Nome do Produto *'}
-                </label>
-                <input type="text" required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
-                  placeholder={isFood ? 'Ex: Macarronada Completa' : 'Ex: Batom Matte Hudamoji'}
-                  className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition" />
-              </div>
+            {/* Scrollable step content */}
+            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
+              <div className="p-6 space-y-5">
+                {/* ====== STEP 0: Informações ====== */}
+                {modalStep === 0 && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">
+                        {isFood ? 'Nome do Item *' : 'Nome do Produto *'}
+                      </label>
+                      <input type="text" required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                        placeholder={isFood ? 'Ex: Macarronada Completa' : 'Ex: Batom Matte Hudamoji'}
+                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition" />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">{isFood ? 'Preço base *' : 'Preço *'}</label>
+                        <div className="relative">
+                          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium">R$</span>
+                          <input type="text" required value={form.priceDisplay} onChange={handlePriceChange}
+                            placeholder="0,00" inputMode="numeric"
+                            className="w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition" />
+                        </div>
+                        {isFood && form.optionGroups.length > 0 && (
+                          <p className="text-xs text-slate-400 mt-1">Preço base sem os extras</p>
+                        )}
+                      </div>
+                      <div>
+                        <label className="block text-sm font-semibold text-slate-700 mb-1.5">Categoria *</label>
+                        <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
+                          className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 bg-white transition">
+                          {categorySuggestions.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">Descrição</label>
+                      <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                        rows={3} placeholder={isFood ? 'Ex: Macarronada artesanal feita na hora' : 'Descreva o produto...'}
+                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 resize-none transition" />
+                    </div>
+                  </>
+                )}
 
-              {/* Preço + Categoria */}
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                    {isFood ? 'Preço base *' : 'Preço *'}
-                  </label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 font-medium">R$</span>
-                    <input type="text" required value={form.priceDisplay} onChange={handlePriceChange}
-                      placeholder="0,00" inputMode="numeric"
-                      className="w-full pl-10 pr-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition" />
-                  </div>
-                  {isFood && form.optionGroups.length > 0 && (
-                    <p className="text-xs text-slate-400 mt-1">Preço base sem os extras das opções</p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold text-slate-700 mb-1.5">Categoria *</label>
-                  <select value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
-                    className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary bg-white transition">
-                    {categorySuggestions.map(c => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                </div>
-              </div>
-
-              {/* Descrição */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Descrição</label>
-                <textarea value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-                  rows={3} placeholder={isFood ? 'Ex: Macarronada artesanal feita na hora' : 'Descreva o produto...'}
-                  className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary resize-none transition" />
-              </div>
-
-              {/* ====== ETAPAS DE MONTAGEM (só para comida) ====== */}
-              {isFood && (
-                <div className="border-t border-slate-100 pt-5">
+                {/* ====== STEP 1: Montagem (food only) ====== */}
+                {isFood && modalStep === 1 && (
                   <OptionGroupsEditor
                     groups={form.optionGroups}
                     onChange={(groups) => setForm(f => ({ ...f, optionGroups: groups }))}
                   />
-                </div>
-              )}
+                )}
 
-              {/* Imagens */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Imagens</label>
-                <div className="flex gap-2 mb-3">
-                  <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-dashed border-slate-300 rounded-xl text-sm text-slate-600 hover:border-primary hover:text-primary hover:bg-primary/5 transition disabled:opacity-50">
-                    {uploading ? <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</> : <><Upload className="w-4 h-4" /> Subir do PC/Celular</>}
-                  </button>
-                  <button type="button" onClick={addUrlManual}
-                    className="px-4 py-2.5 border-2 border-dashed border-slate-300 rounded-xl text-sm text-slate-600 hover:border-primary hover:text-primary hover:bg-primary/5 transition">
-                    <ImageIcon className="w-4 h-4" />
-                  </button>
-                </div>
-                <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleFileUpload} className="hidden" />
-
-                {form.imageUrls.length > 0 && (
-                  <div className="grid grid-cols-4 gap-2">
-                    {form.imageUrls.map((url, i) => (
-                      <div key={i} className={`relative group rounded-xl overflow-hidden aspect-square border-2 transition cursor-pointer ${form.image_url === url ? 'border-primary shadow-md' : 'border-transparent hover:border-slate-300'}`}
-                        onClick={() => setMainImage(i)}>
-                        <img loading="lazy" src={url} alt="" className="w-full h-full object-cover" />
-                        {form.image_url === url && (
-                          <div className="absolute bottom-0 left-0 right-0 bg-primary text-white text-[10px] text-center py-0.5 font-semibold">PRINCIPAL</div>
-                        )}
-                        <button type="button" onClick={(e) => { e.stopPropagation(); removeImage(i); }}
-                          className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs">
-                          <X className="w-3 h-3" />
+                {/* ====== STEP 2 (or 1 for non-food): Mídia & Config ====== */}
+                {modalStep === adminTotalSteps - 1 && (
+                  <>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">Imagens</label>
+                      <div className="flex gap-2 mb-3">
+                        <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploading}
+                          className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 border-2 border-dashed border-slate-200 rounded-xl text-sm text-slate-600 hover:border-primary hover:text-primary hover:bg-primary/5 transition disabled:opacity-50">
+                          {uploading ? <><Loader2 className="w-4 h-4 animate-spin" /> Enviando...</> : <><Upload className="w-4 h-4" /> Subir do PC/Celular</>}
+                        </button>
+                        <button type="button" onClick={addUrlManual}
+                          className="px-4 py-2.5 border-2 border-dashed border-slate-200 rounded-xl text-sm text-slate-600 hover:border-primary hover:text-primary hover:bg-primary/5 transition">
+                          <ImageIcon className="w-4 h-4" />
                         </button>
                       </div>
-                    ))}
-                  </div>
+                      <input ref={fileInputRef} type="file" accept="image/*" multiple onChange={handleFileUpload} className="hidden" />
+                      {form.imageUrls.length > 0 && (
+                        <div className="grid grid-cols-4 gap-2">
+                          {form.imageUrls.map((url, i) => (
+                            <div key={i} className={`relative group rounded-xl overflow-hidden aspect-square border-2 transition cursor-pointer ${form.image_url === url ? 'border-primary shadow-md' : 'border-transparent hover:border-slate-300'}`}
+                              onClick={() => setMainImage(i)}>
+                              <img loading="lazy" src={url} alt="" className="w-full h-full object-cover" />
+                              {form.image_url === url && (
+                                <div className="absolute bottom-0 left-0 right-0 bg-primary text-white text-[10px] text-center py-0.5 font-semibold">PRINCIPAL</div>
+                              )}
+                              <button type="button" onClick={(e) => { e.stopPropagation(); removeImage(i); }}
+                                className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-xs">
+                                <X className="w-3 h-3" />
+                              </button>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      <p className="text-xs text-slate-400 mt-2">Clique para definir como principal.</p>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-slate-700 mb-1.5">Estoque</label>
+                      <input type="number" min="0" value={form.stockDisplay}
+                        onChange={e => setForm(f => ({ ...f, stockDisplay: e.target.value }))}
+                        placeholder="Deixe vazio para ilimitado"
+                        className="w-full px-4 py-2.5 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition" />
+                      <p className="text-xs text-slate-400 mt-1">Vazio = sem controle. Zero = esgotado.</p>
+                    </div>
+                    <div className="flex items-center gap-3 pt-1">
+                      <label className="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" checked={form.active} onChange={e => setForm(f => ({ ...f, active: e.target.checked }))} className="sr-only peer" />
+                        <div className="w-10 h-5 bg-slate-200 peer-focus:ring-2 peer-focus:ring-primary/30 rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition peer-checked:after:translate-x-5 after:shadow-sm" />
+                      </label>
+                      <span className="text-sm text-slate-600">{form.active ? 'Ativo (visível na loja)' : 'Inativo (oculto)'}</span>
+                    </div>
+                  </>
                 )}
-                <p className="text-xs text-slate-400 mt-2">Clique numa imagem para definir como principal.</p>
               </div>
 
-              {/* Estoque */}
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 mb-1.5">Estoque</label>
-                <input type="number" min="0" value={form.stockDisplay}
-                  onChange={e => setForm(f => ({ ...f, stockDisplay: e.target.value }))}
-                  placeholder="Deixe vazio para ilimitado"
-                  className="w-full px-4 py-2.5 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition" />
-                <p className="text-xs text-slate-400 mt-1">Vazio = sem controle de estoque. Zero = esgotado.</p>
-              </div>
-
-              {/* Status */}
-              <div className="flex items-center gap-3 pt-1">
-                <label className="relative inline-flex items-center cursor-pointer">
-                  <input type="checkbox" checked={form.active} onChange={e => setForm(f => ({ ...f, active: e.target.checked }))} className="sr-only peer" />
-                  <div className="w-10 h-5 bg-slate-200 peer-focus:ring-2 peer-focus:ring-primary/30 rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:rounded-full after:h-4 after:w-4 after:transition peer-checked:after:translate-x-5 after:shadow-sm" />
-                </label>
-                <span className="text-sm text-slate-600">{form.active ? 'Ativo (visível na loja)' : 'Inativo (oculto)'}</span>
-              </div>
-
-              {/* Botões */}
-              <div className="pt-4 flex gap-3 border-t border-slate-100">
-                <button type="button" onClick={() => setIsModalOpen(false)}
-                  className="flex-1 px-4 py-3 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition-colors">
-                  Cancelar
-                </button>
-                <button type="submit" disabled={saving}
-                  className="flex-1 px-4 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-hover transition-colors shadow-md shadow-pink-200 disabled:opacity-50 flex items-center justify-center gap-2">
-                  {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : (isFood ? 'Salvar Item' : 'Salvar Produto')}
-                </button>
+              {/* Footer with navigation */}
+              <div className="sticky bottom-0 bg-white border-t border-slate-100 px-6 py-4 flex gap-3 shrink-0">
+                {modalStep > 0 ? (
+                  <button type="button" onClick={() => setModalStep(s => s - 1)}
+                    className="px-4 py-3 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition-colors flex items-center gap-1">
+                    <ChevronLeft className="w-4 h-4" /> Voltar
+                  </button>
+                ) : (
+                  <button type="button" onClick={() => setIsModalOpen(false)}
+                    className="px-4 py-3 bg-slate-100 text-slate-700 font-semibold rounded-xl hover:bg-slate-200 transition-colors">
+                    Cancelar
+                  </button>
+                )}
+                {modalStep < adminTotalSteps - 1 ? (
+                  <button type="button" onClick={() => setModalStep(s => s + 1)}
+                    className="flex-1 px-4 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-hover transition-colors shadow-md shadow-pink-200 flex items-center justify-center gap-1">
+                    Próximo <ChevronRight className="w-4 h-4" />
+                  </button>
+                ) : (
+                  <button type="submit" disabled={saving}
+                    className="flex-1 px-4 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-hover transition-colors shadow-md shadow-pink-200 disabled:opacity-50 flex items-center justify-center gap-2">
+                    {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : (isFood ? 'Salvar Item' : 'Salvar Produto')}
+                  </button>
+                )}
               </div>
             </form>
           </div>

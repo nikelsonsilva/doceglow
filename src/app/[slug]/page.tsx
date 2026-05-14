@@ -185,6 +185,7 @@ export default function StorePage() {
         isOpen={isCheckoutOpen} 
         onClose={() => setIsCheckoutOpen(false)}
         storeSlug={slug}
+        storeName={store.name}
         storeSettings={{ whatsapp_number: store.whatsapp_number, pix_key: store.pix_key }}
       />
 

@@ -31,10 +31,11 @@ interface Props {
   isOpen: boolean; 
   onClose: () => void;
   storeSlug?: string;
+  storeName?: string;
   storeSettings?: { whatsapp_number: string; pix_key: string };
 }
 
-export default function CheckoutModal({ isOpen, onClose, storeSlug, storeSettings: extSettings }: Props) {
+export default function CheckoutModal({ isOpen, onClose, storeSlug, storeName, storeSettings: extSettings }: Props) {
   const [step, setStep] = useState<Step>('phone');
   const [loading, setLoading] = useState(false);
   const [phone, setPhone] = useState('');
@@ -246,7 +247,7 @@ export default function CheckoutModal({ isOpen, onClose, storeSlug, storeSetting
     } catch {}
 
     const msg = [
-      `*NOVO PEDIDO - DOCE GLOW!* 🛍️`,
+      `*NOVO PEDIDO - ${(storeName || 'LOJA').toUpperCase()}!* 🛍️`,
       ``,
       `*Cliente:* ${customer?.name}`,
       `*Telefone:* ${formatPhone(rawPhone)}`,

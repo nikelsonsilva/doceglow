@@ -1,6 +1,6 @@
 'use client';
 
-import { Plus, Trash2, GripVertical, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, Trash2, GripVertical, ChevronDown, ChevronUp, Sparkles } from 'lucide-react';
 import { useState } from 'react';
 
 export interface OptionItem {
@@ -22,9 +22,10 @@ interface Props {
   onChange: (groups: OptionGroup[]) => void;
 }
 
-const FOOD_TEMPLATES: { label: string; groups: OptionGroup[] }[] = [
+const FOOD_TEMPLATES: { label: string; emoji: string; groups: OptionGroup[] }[] = [
   {
-    label: '🍝 Macarronada (Montável)',
+    label: 'Macarronada',
+    emoji: '🍝',
     groups: [
       { name: 'Escolha a massa', min_select: 1, max_select: 1, price_mode: 'add', sort_order: 0, options: [
         { name: 'Espaguete', extra_price: 0 }, { name: 'Talharim', extra_price: 0 },
@@ -46,7 +47,8 @@ const FOOD_TEMPLATES: { label: string; groups: OptionGroup[] }[] = [
     ],
   },
   {
-    label: '🍔 Hambúrguer (Montável)',
+    label: 'Hambúrguer',
+    emoji: '🍔',
     groups: [
       { name: 'Escolha o pão', min_select: 1, max_select: 1, price_mode: 'add', sort_order: 0, options: [
         { name: 'Brioche', extra_price: 0 }, { name: 'Australiano', extra_price: 0 },
@@ -63,7 +65,8 @@ const FOOD_TEMPLATES: { label: string; groups: OptionGroup[] }[] = [
     ],
   },
   {
-    label: '🍕 Pizza (Montável)',
+    label: 'Pizza',
+    emoji: '🍕',
     groups: [
       { name: 'Tamanho', min_select: 1, max_select: 1, price_mode: 'replace', sort_order: 0, options: [
         { name: 'Pequena (4 fatias)', extra_price: 25 }, { name: 'Média (6 fatias)', extra_price: 35 },
@@ -85,7 +88,7 @@ export default function OptionGroupsEditor({ groups, onChange }: Props) {
 
   const addGroup = () => {
     const newGroup: OptionGroup = {
-      name: `Passo ${groups.length + 1}`,
+      name: '',
       min_select: 1,
       max_select: 1,
       price_mode: 'add',
@@ -151,129 +154,190 @@ export default function OptionGroupsEditor({ groups, onChange }: Props) {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <label className="block text-sm font-semibold text-slate-700">Etapas de Montagem</label>
-          <p className="text-xs text-slate-400 mt-0.5">Configure os passos que o cliente vai seguir pra montar o pedido</p>
-        </div>
-      </div>
-
-      {/* Templates */}
+      {/* Templates - show when empty */}
       {groups.length === 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-          <p className="text-sm font-medium text-amber-800 mb-2">💡 Comece com um modelo pronto:</p>
-          <div className="flex flex-wrap gap-2">
+        <div className="rounded-2xl border-2 border-dashed border-primary/20 bg-gradient-to-br from-primary/5 to-transparent p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Sparkles className="w-4 h-4 text-primary" />
+            <p className="text-sm font-semibold text-slate-700">Comece com um modelo pronto</p>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
             {FOOD_TEMPLATES.map((t, i) => (
               <button key={i} type="button" onClick={() => applyTemplate(t)}
-                className="px-3 py-1.5 bg-white border border-amber-300 rounded-lg text-sm font-medium text-amber-700 hover:bg-amber-100 transition">
-                {t.label}
+                className="flex flex-col items-center gap-1.5 p-3 bg-white border border-slate-200 rounded-xl text-sm font-medium text-slate-700 hover:border-primary hover:bg-primary/5 hover:shadow-md hover:shadow-primary/10 transition-all duration-200 group">
+                <span className="text-2xl group-hover:scale-110 transition-transform">{t.emoji}</span>
+                <span className="text-xs">{t.label}</span>
               </button>
             ))}
           </div>
         </div>
       )}
 
-      {/* Groups */}
-      {groups.map((group, gIdx) => (
-        <div key={gIdx} className="border border-slate-200 rounded-xl overflow-hidden bg-white shadow-sm">
-          {/* Group Header */}
-          <div
-            className="flex items-center gap-2 px-4 py-3 bg-slate-50 cursor-pointer hover:bg-slate-100 transition"
-            onClick={() => setExpandedGroup(expandedGroup === gIdx ? null : gIdx)}
-          >
-            <GripVertical className="w-4 h-4 text-slate-300 shrink-0" />
-            <div className="flex items-center gap-1 shrink-0">
-              <button type="button" onClick={(e) => { e.stopPropagation(); moveGroup(gIdx, -1); }}
-                disabled={gIdx === 0} className="p-0.5 text-slate-400 hover:text-slate-600 disabled:opacity-30">
-                <ChevronUp className="w-3.5 h-3.5" />
-              </button>
-              <button type="button" onClick={(e) => { e.stopPropagation(); moveGroup(gIdx, 1); }}
-                disabled={gIdx === groups.length - 1} className="p-0.5 text-slate-400 hover:text-slate-600 disabled:opacity-30">
-                <ChevronDown className="w-3.5 h-3.5" />
-              </button>
-            </div>
-            <span className="text-xs font-bold text-primary bg-primary/10 px-2 py-0.5 rounded-full shrink-0">
-              Passo {gIdx + 1}
-            </span>
-            <span className="text-sm font-medium text-slate-700 truncate flex-1">{group.name || 'Sem nome'}</span>
-            <span className="text-xs text-slate-400 shrink-0">{group.options.length} opções</span>
-            <button type="button" onClick={(e) => { e.stopPropagation(); removeGroup(gIdx); }}
-              className="p-1 text-slate-400 hover:text-red-500 transition shrink-0">
-              <Trash2 className="w-4 h-4" />
-            </button>
-            <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform shrink-0 ${expandedGroup === gIdx ? 'rotate-180' : ''}`} />
-          </div>
-
-          {/* Group Content */}
-          {expandedGroup === gIdx && (
-            <div className="p-4 space-y-3 border-t border-slate-100">
-              {/* Group name */}
-              <input type="text" value={group.name} placeholder="Ex: Escolha a massa"
-                onChange={e => updateGroup(gIdx, 'name', e.target.value)}
-                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/40" />
-
-              {/* Min/Max select */}
-              <div className="grid grid-cols-3 gap-2">
-                <div>
-                  <label className="text-xs text-slate-500">Mín.</label>
-                  <input type="number" min="0" value={group.min_select}
-                    onChange={e => updateGroup(gIdx, 'min_select', parseInt(e.target.value) || 0)}
-                    className="w-full px-2 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/40" />
-                </div>
-                <div>
-                  <label className="text-xs text-slate-500">Máx.</label>
-                  <input type="number" min="1" value={group.max_select}
-                    onChange={e => updateGroup(gIdx, 'max_select', parseInt(e.target.value) || 1)}
-                    className="w-full px-2 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/40" />
-                </div>
-                <div>
-                  <label className="text-xs text-slate-500">Preço</label>
-                  <select value={group.price_mode}
-                    onChange={e => updateGroup(gIdx, 'price_mode', e.target.value)}
-                    className="w-full px-2 py-1.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/40">
-                    <option value="add">Somar (+R$)</option>
-                    <option value="replace">Substituir preço</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Options */}
-              <div className="space-y-2">
-                <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Opções</p>
-                {group.options.map((opt, oIdx) => (
-                  <div key={oIdx} className="flex items-center gap-2">
-                    <input type="text" value={opt.name} placeholder={`Opção ${oIdx + 1}`}
-                      onChange={e => updateOption(gIdx, oIdx, 'name', e.target.value)}
-                      className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/40" />
-                    <div className="relative w-24 shrink-0">
-                      <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-slate-400">+R$</span>
-                      <input type="number" step="0.01" min="0" value={opt.extra_price || ''}
-                        onChange={e => updateOption(gIdx, oIdx, 'extra_price', parseFloat(e.target.value) || 0)}
-                        placeholder="0,00"
-                        className="w-full pl-9 pr-2 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/40" />
+      {/* Groups list */}
+      {groups.length > 0 && (
+        <div className="space-y-3">
+          {groups.map((group, gIdx) => {
+            const isExpanded = expandedGroup === gIdx;
+            const validOptions = group.options.filter(o => o.name.trim());
+            
+            return (
+              <div key={gIdx}
+                className={`rounded-xl border transition-all duration-200 overflow-hidden ${
+                  isExpanded 
+                    ? 'border-primary/30 shadow-lg shadow-primary/5 bg-white' 
+                    : 'border-slate-200 bg-white hover:border-slate-300 hover:shadow-sm'
+                }`}
+              >
+                {/* Group Header */}
+                <div
+                  className={`flex items-center gap-3 px-4 py-3.5 cursor-pointer transition-colors ${
+                    isExpanded ? 'bg-gradient-to-r from-primary/5 to-transparent' : 'hover:bg-slate-50'
+                  }`}
+                  onClick={() => setExpandedGroup(isExpanded ? null : gIdx)}
+                >
+                  {/* Drag handle + reorder */}
+                  <div className="flex items-center gap-0.5 shrink-0">
+                    <GripVertical className="w-4 h-4 text-slate-300" />
+                    <div className="flex flex-col">
+                      <button type="button" onClick={(e) => { e.stopPropagation(); moveGroup(gIdx, -1); }}
+                        disabled={gIdx === 0}
+                        className="p-0.5 text-slate-400 hover:text-primary disabled:opacity-20 transition-colors">
+                        <ChevronUp className="w-3 h-3" />
+                      </button>
+                      <button type="button" onClick={(e) => { e.stopPropagation(); moveGroup(gIdx, 1); }}
+                        disabled={gIdx === groups.length - 1}
+                        className="p-0.5 text-slate-400 hover:text-primary disabled:opacity-20 transition-colors">
+                        <ChevronDown className="w-3 h-3" />
+                      </button>
                     </div>
-                    <button type="button" onClick={() => removeOption(gIdx, oIdx)}
-                      disabled={group.options.length <= 1}
-                      className="p-1.5 text-slate-400 hover:text-red-500 transition disabled:opacity-30">
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
                   </div>
-                ))}
-                <button type="button" onClick={() => addOption(gIdx)}
-                  className="flex items-center gap-1 text-sm text-primary font-medium hover:text-primary-hover transition">
-                  <Plus className="w-3.5 h-3.5" /> Adicionar opção
-                </button>
+
+                  {/* Step badge */}
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 transition-colors ${
+                    isExpanded 
+                      ? 'bg-primary text-white' 
+                      : 'bg-slate-100 text-slate-500'
+                  }`}>
+                    {gIdx + 1}
+                  </div>
+
+                  {/* Title + meta */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-slate-800 truncate">
+                      {group.name || <span className="text-slate-400 italic">Sem nome</span>}
+                    </p>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      {validOptions.length} {validOptions.length === 1 ? 'opção' : 'opções'}
+                      {group.min_select > 0 && <span> · Obrigatório</span>}
+                      {group.price_mode === 'replace' && <span> · Substitui preço</span>}
+                    </p>
+                  </div>
+
+                  {/* Actions */}
+                  <button type="button" onClick={(e) => { e.stopPropagation(); removeGroup(gIdx); }}
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-red-500 hover:bg-red-50 transition-all shrink-0">
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform duration-200 shrink-0 ${
+                    isExpanded ? 'rotate-180' : ''
+                  }`} />
+                </div>
+
+                {/* Group Content - Expanded */}
+                {isExpanded && (
+                  <div className="border-t border-slate-100 animate-[fadeSlideDown_0.2s_ease-out]">
+                    {/* Config area */}
+                    <div className="p-4 space-y-4">
+                      {/* Group name */}
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
+                          Nome da Etapa
+                        </label>
+                        <input type="text" value={group.name} placeholder="Ex: Escolha a massa"
+                          onChange={e => updateGroup(gIdx, 'name', e.target.value)}
+                          className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all placeholder:text-slate-300" />
+                      </div>
+
+                      {/* Settings row */}
+                      <div className="grid grid-cols-3 gap-3">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
+                            Mín.
+                          </label>
+                          <input type="number" min="0" value={group.min_select}
+                            onChange={e => updateGroup(gIdx, 'min_select', parseInt(e.target.value) || 0)}
+                            className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm text-center font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
+                            Máx.
+                          </label>
+                          <input type="number" min="1" value={group.max_select}
+                            onChange={e => updateGroup(gIdx, 'max_select', parseInt(e.target.value) || 1)}
+                            className="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-sm text-center font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all" />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-500 mb-1.5 uppercase tracking-wider">
+                            Preço
+                          </label>
+                          <select value={group.price_mode}
+                            onChange={e => updateGroup(gIdx, 'price_mode', e.target.value)}
+                            className="w-full px-2 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 bg-white transition-all">
+                            <option value="add">Somar (+R$)</option>
+                            <option value="replace">Substituir</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Divider */}
+                      <div className="border-t border-slate-100" />
+
+                      {/* Options */}
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Opções</p>
+                          <span className="text-[11px] text-slate-400">{group.options.length} itens</span>
+                        </div>
+                        {group.options.map((opt, oIdx) => (
+                          <div key={oIdx} className="flex items-center gap-2 group/opt">
+                            <div className="w-5 h-5 rounded-full border-2 border-slate-200 flex items-center justify-center shrink-0">
+                              <span className="text-[10px] text-slate-400 font-medium">{oIdx + 1}</span>
+                            </div>
+                            <input type="text" value={opt.name} placeholder={`Opção ${oIdx + 1}`}
+                              onChange={e => updateOption(gIdx, oIdx, 'name', e.target.value)}
+                              className="flex-1 px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all placeholder:text-slate-300" />
+                            <div className="relative w-24 shrink-0">
+                              <span className="absolute left-2.5 top-1/2 -translate-y-1/2 text-[11px] text-slate-400 font-medium">+R$</span>
+                              <input type="number" step="0.01" min="0" value={opt.extra_price || ''}
+                                onChange={e => updateOption(gIdx, oIdx, 'extra_price', parseFloat(e.target.value) || 0)}
+                                placeholder="0,00"
+                                className="w-full pl-9 pr-2 py-2 border border-slate-200 rounded-lg text-sm text-right font-medium focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition-all" />
+                            </div>
+                            <button type="button" onClick={() => removeOption(gIdx, oIdx)}
+                              disabled={group.options.length <= 1}
+                              className="p-1.5 rounded-lg text-slate-300 hover:text-red-500 hover:bg-red-50 transition-all disabled:opacity-20 opacity-0 group-hover/opt:opacity-100">
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ))}
+                        <button type="button" onClick={() => addOption(gIdx)}
+                          className="flex items-center gap-1.5 text-sm text-primary font-medium hover:text-primary-hover transition-colors mt-1 px-1">
+                          <Plus className="w-3.5 h-3.5" /> Adicionar opção
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
-            </div>
-          )}
+            );
+          })}
         </div>
-      ))}
+      )}
 
       {/* Add group button */}
       <button type="button" onClick={addGroup}
-        className="w-full flex items-center justify-center gap-2 py-3 border-2 border-dashed border-slate-300 rounded-xl text-sm font-medium text-slate-500 hover:border-primary hover:text-primary hover:bg-primary/5 transition">
-        <Plus className="w-4 h-4" /> Adicionar etapa de montagem
+        className="w-full flex items-center justify-center gap-2 py-3.5 border-2 border-dashed border-slate-200 rounded-xl text-sm font-semibold text-slate-400 hover:border-primary hover:text-primary hover:bg-primary/5 hover:shadow-md hover:shadow-primary/5 transition-all duration-200">
+        <Plus className="w-4 h-4" /> Nova etapa de montagem
       </button>
     </div>
   );
