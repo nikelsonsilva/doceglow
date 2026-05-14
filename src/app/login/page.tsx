@@ -28,11 +28,7 @@ export default function LoginPage() {
 
       if (!res.ok) throw new Error(data.error || 'Erro no login');
 
-      // Store session tokens in cookies for middleware
-      if (data.session) {
-        document.cookie = `sb-access-token=${data.session.access_token}; path=/; max-age=604800; SameSite=Lax`;
-        document.cookie = `sb-refresh-token=${data.session.refresh_token}; path=/; max-age=604800; SameSite=Lax`;
-      }
+      // Cookies are set automatically by the API response (Set-Cookie headers)
 
       if (data.store) {
         toast.success(`Bem-vindo ao painel de ${data.store.name}!`);
