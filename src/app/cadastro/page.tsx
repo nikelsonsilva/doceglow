@@ -201,14 +201,14 @@ export default function CadastroPage() {
                     <><Loader2 className="w-3.5 h-3.5 animate-spin text-slate-400" /><span className="text-xs text-slate-400">Verificando...</span></>
                   ) : slugStatus ? (
                     slugStatus.available ? (
-                      <><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /><span className="text-xs text-emerald-600">Disponível: <span className="font-medium">vitrinia.semfila.app/{slugStatus.slug}</span></span></>
+                      <><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /><span className="text-xs text-emerald-600">Disponível: <span className="font-medium">{process.env.NEXT_PUBLIC_APP_DOMAIN || 'vitrinia.semfila.app'}/{slugStatus.slug}</span></span></>
                     ) : (
                       <><XCircle className="w-3.5 h-3.5 text-red-500" /><span className="text-xs text-red-500">{slugStatus.reason || 'Indisponível'}</span></>
                     )
                   ) : (
                     <span className="text-xs text-slate-400">
                       Sua loja ficará em: <span className="text-primary font-medium">
-                        vitrinia.semfila.app/{form.store_name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').slice(0, 40)}
+                        {process.env.NEXT_PUBLIC_APP_DOMAIN || 'vitrinia.semfila.app'}/{form.store_name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').slice(0, 40)}
                       </span>
                     </span>
                   )}
