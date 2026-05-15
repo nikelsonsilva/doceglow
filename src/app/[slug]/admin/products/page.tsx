@@ -182,10 +182,8 @@ export default function AdminProducts() {
     toast.success('Imagem principal definida!');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     if (!form.name || !form.priceDisplay) { toast.error('Preencha nome e preço'); return; }
-    if (modalStep < adminTotalSteps - 1) return; // safety guard
 
     // Validate option groups
     if (form.optionGroups.length > 0) {
@@ -373,9 +371,8 @@ export default function AdminProducts() {
               </div>
             </div>
 
-            {/* Scrollable step content — noValidate prevents browser validation from interfering with wizard steps */}
-            <form onSubmit={handleSubmit} noValidate className="flex-1 overflow-y-auto"
-              onKeyDown={(e) => { if (e.key === 'Enter' && modalStep < adminTotalSteps - 1) e.preventDefault(); }}>
+            {/* Scrollable step content */}
+            <div className="flex-1 overflow-y-auto">
               <div className="p-6 space-y-5">
                 {/* ====== STEP 0: Informações ====== */}
                 {modalStep === 0 && (
@@ -499,13 +496,13 @@ export default function AdminProducts() {
                     Próximo <ChevronRight className="w-4 h-4" />
                   </button>
                 ) : (
-                  <button type="submit" disabled={saving}
+                  <button type="button" disabled={saving} onClick={handleSubmit}
                     className="flex-1 px-4 py-3 bg-primary text-white font-semibold rounded-xl hover:bg-primary-hover transition-colors shadow-md shadow-pink-200 disabled:opacity-50 flex items-center justify-center gap-2">
                     {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Salvando...</> : (isFood ? 'Salvar Item' : 'Salvar Produto')}
                   </button>
                 )}
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}
