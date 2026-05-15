@@ -429,11 +429,24 @@ export default function CheckoutModal({ isOpen, onClose, storeSlug, storeName, s
                     <div className="flex-1 min-w-0">
                       <h4 className="text-sm font-medium text-slate-700 truncate">{item.name}</h4>
                       {item.selectedOptions?.length ? (
-                        <p className="text-[10px] text-slate-400 mt-0.5 line-clamp-2">
-                          {item.selectedOptions.map(s => s.options.join(', ')).join(' · ')}
-                        </p>
+                        <div className="mt-1 space-y-0.5">
+                          {item.selectedOptions.map((s, si) => (
+                            <p key={si} className="text-[11px] text-slate-400 flex items-start gap-1">
+                              <span className="text-slate-300 shrink-0">↳</span>
+                              <span>
+                                <span className="text-slate-400">{s.groupName}:</span>{' '}
+                                <span className="text-slate-600 font-medium">{s.options.join(', ')}</span>
+                                {s.extra > 0 && (
+                                  <span className="text-emerald-500 ml-1">
+                                    ({s.priceMode === 'replace' ? 'R$' : '+R$'} {s.extra.toFixed(2).replace('.', ',')})
+                                  </span>
+                                )}
+                              </span>
+                            </p>
+                          ))}
+                        </div>
                       ) : null}
-                      <p className="text-xs text-slate-400 mt-0.5">R$ {item.unitPrice.toFixed(2).replace('.',',')} cada</p>
+                      <p className="text-xs text-slate-400 mt-1">R$ {item.unitPrice.toFixed(2).replace('.',',')} cada</p>
                       <div className="flex items-center justify-between mt-2">
                         <div className="flex items-center gap-2">
                           <button onClick={() => updateQuantity(item.cartItemId, item.quantity - 1)}
