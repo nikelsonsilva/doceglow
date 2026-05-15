@@ -17,8 +17,8 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "Doce Glow",
-  description: "Catálogo Online Doce Glow - Cosméticos e Beleza",
+  title: "Vitrinia",
+  description: "Vitrinia - Sua vitrine digital para vender online",
   icons: {
     icon: [
       { url: '/favicon.ico', sizes: 'any' },

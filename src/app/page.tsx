@@ -18,7 +18,7 @@ export default function LandingPage() {
             <div className="w-9 h-9 rounded-full bg-white/15 flex items-center justify-center backdrop-blur-sm">
               <Store className="w-[18px] h-[18px] text-white" />
             </div>
-            <span className="font-bold text-[22px] text-white tracking-tight">Doce Glow</span>
+            <span className="font-bold text-[22px] text-white tracking-tight">Vitrinia</span>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/login" className="text-[14px] font-medium text-white/90 hover:text-white transition-colors flex items-center gap-1.5">
@@ -73,7 +73,7 @@ export default function LandingPage() {
               <div className="relative z-10 h-full flex items-end">
                 <Image
                   src="/images/hero-model.png"
-                  alt="Empreendedora usando Doce Glow"
+                  alt="Empreendedora usando Vitrinia"
                   width={520}
                   height={640}
                   className="object-cover object-top h-[600px] w-auto"
@@ -87,7 +87,7 @@ export default function LandingPage() {
                 {/* Success card */}
                 <div className="bg-white rounded-2xl shadow-2xl p-4 mb-4">
                   <p className="text-[13px] font-bold text-slate-800 mb-1">Faça como a Ana</p>
-                  <p className="text-[11px] text-slate-500 leading-relaxed">+26% no faturamento nos primeiros 5 meses com a Doce Glow</p>
+                  <p className="text-[11px] text-slate-500 leading-relaxed">+26% no faturamento nos primeiros 5 meses com a Vitrinia</p>
                 </div>
                 {/* Phone in glass card */}
                 <div className="bg-white/95 backdrop-blur-xl rounded-[24px] p-3 shadow-2xl">
@@ -123,7 +123,7 @@ export default function LandingPage() {
           <div className="text-center max-w-2xl mx-auto mb-16">
             <span className="inline-flex items-center gap-2 bg-blue-50 text-[#0B2A8A] px-4 py-1.5 rounded-full text-[13px] font-semibold mb-5">
               <Sparkles className="w-4 h-4" />
-              Por que a Doce Glow?
+              Por que a Vitrinia?
             </span>
             <h2 className="text-[32px] md:text-[40px] font-bold text-slate-900 leading-tight mb-4">
               Tudo que você precisa para{' '}
@@ -232,9 +232,9 @@ export default function LandingPage() {
             <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
               <Store className="w-4 h-4 text-white" />
             </div>
-            <span className="font-bold text-white text-[16px]">Doce Glow</span>
+            <span className="font-bold text-white text-[16px]">Vitrinia</span>
           </div>
-          <p className="text-[13px]">© {new Date().getFullYear()} Doce Glow. Todos os direitos reservados.</p>
+          <p className="text-[13px]">© {new Date().getFullYear()} Vitrinia. Todos os direitos reservados.</p>
         </div>
       </footer>
     </div>

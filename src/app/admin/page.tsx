@@ -8,7 +8,7 @@ export default function LegacyAdminRedirect() {
   const router = useRouter();
 
   useEffect(() => {
-    // Redirecionar para a loja Doce Glow (primeira loja)
+    // Redirecionar para a primeira loja (legado)
     router.replace('/doceglow/admin');
   }, [router]);
 

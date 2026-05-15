@@ -1,6 +1,6 @@
 // Customer session management with 7-day expiration
 
-const STORAGE_KEY = 'doceglow_session';
+const STORAGE_KEY = 'vitrinia_session';
 const SESSION_DAYS = 7;
 
 interface CustomerSession {
@@ -20,7 +20,7 @@ export function saveSession(phone: string, name?: string): void {
   };
   localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
   // Keep legacy key for compatibility
-  localStorage.setItem('doceglow_phone', phone);
+  localStorage.setItem('vitrinia_phone', phone);
 }
 
 export function getSession(): CustomerSession | null {
@@ -28,7 +28,7 @@ export function getSession(): CustomerSession | null {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (!raw) {
       // Fallback: check legacy key
-      const legacyPhone = localStorage.getItem('doceglow_phone');
+      const legacyPhone = localStorage.getItem('vitrinia_phone') || localStorage.getItem('doceglow_phone');
       if (legacyPhone) {
         // Migrate to new format
         saveSession(legacyPhone);
@@ -61,7 +61,8 @@ export function isSessionValid(): boolean {
 
 export function clearSession(): void {
   localStorage.removeItem(STORAGE_KEY);
-  localStorage.removeItem('doceglow_phone');
+  localStorage.removeItem('vitrinia_phone');
+  localStorage.removeItem('doceglow_phone'); // legacy cleanup
 }
 
 export function refreshSession(): void {

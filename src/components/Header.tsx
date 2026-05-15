@@ -19,7 +19,7 @@ export default function Header({ storeName, onOpenOrders, hasOrders }: HeaderPro
         <div className="w-10"></div>
         
         <h1 className="font-serif text-2xl font-bold text-primary tracking-tight truncate max-w-[200px]">
-          {storeName || 'Doce Glow'}
+          {storeName || 'Vitrinia'}
         </h1>
         
         <div className="flex items-center gap-1">

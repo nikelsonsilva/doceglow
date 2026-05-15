@@ -142,7 +142,7 @@ export default function CheckoutModal({ isOpen, onClose, storeSlug, storeName, s
 
       // Save verified phone with 7-day session
       saveSession(rawPhone);
-      window.dispatchEvent(new Event('doceglow:phone-verified'));
+      window.dispatchEvent(new Event('vitrinia:phone-verified'));
 
       const apiBase = storeSlug ? `/api/stores/${storeSlug}` : '/api';
       const custRes = await fetch(`${apiBase}/customers?phone=${rawPhone}`);

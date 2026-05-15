@@ -116,7 +116,7 @@ export default function CadastroPage() {
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center">
               <Store className="w-4 h-4 text-white" />
             </div>
-            <span className="font-serif font-bold text-xl text-slate-800">Doce Glow</span>
+            <span className="font-serif font-bold text-xl text-slate-800">Vitrinia</span>
           </div>
           <div className="w-16" />
         </div>
@@ -201,14 +201,14 @@ export default function CadastroPage() {
                     <><Loader2 className="w-3.5 h-3.5 animate-spin text-slate-400" /><span className="text-xs text-slate-400">Verificando...</span></>
                   ) : slugStatus ? (
                     slugStatus.available ? (
-                      <><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /><span className="text-xs text-emerald-600">Disponível: <span className="font-medium">doceglow.semfila.app/{slugStatus.slug}</span></span></>
+                      <><CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" /><span className="text-xs text-emerald-600">Disponível: <span className="font-medium">vitrinia.app/{slugStatus.slug}</span></span></>
                     ) : (
                       <><XCircle className="w-3.5 h-3.5 text-red-500" /><span className="text-xs text-red-500">{slugStatus.reason || 'Indisponível'}</span></>
                     )
                   ) : (
                     <span className="text-xs text-slate-400">
                       Sua loja ficará em: <span className="text-primary font-medium">
-                        doceglow.semfila.app/{form.store_name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').slice(0, 40)}
+                        vitrinia.app/{form.store_name.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9\s-]/g, '').replace(/\s+/g, '-').slice(0, 40)}
                       </span>
                     </span>
                   )}

@@ -57,7 +57,7 @@ export default function LoginPage() {
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center">
               <Store className="w-4 h-4 text-white" />
             </div>
-            <span className="font-serif font-bold text-xl text-slate-800">Doce Glow</span>
+            <span className="font-serif font-bold text-xl text-slate-800">Vitrinia</span>
           </div>
           <div className="w-16" />
         </div>

@@ -96,10 +96,10 @@ export default function StorePage() {
       if (saved) setCustomerPhone(saved);
     };
     window.addEventListener('storage', handler);
-    window.addEventListener('doceglow:phone-verified', handler);
+    window.addEventListener('vitrinia:phone-verified', handler);
     return () => {
       window.removeEventListener('storage', handler);
-      window.removeEventListener('doceglow:phone-verified', handler);
+      window.removeEventListener('vitrinia:phone-verified', handler);
     };
   }, []);
 

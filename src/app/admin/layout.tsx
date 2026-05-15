@@ -21,7 +21,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
         <Link href="/" className="text-slate-400 hover:text-slate-600 transition-colors">
           <ArrowLeft className="w-5 h-5" />
         </Link>
-        <h1 className="font-serif font-bold text-lg text-primary">Admin Doce Glow</h1>
+        <h1 className="font-serif font-bold text-lg text-primary">Admin Vitrinia</h1>
         <div className="w-5" />
       </header>
 
@@ -29,7 +29,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       <aside className="hidden md:flex w-64 bg-white border-r border-slate-200 flex-col shrink-0">
         <div className="h-16 flex items-center px-6 border-b border-slate-200">
           <Link href="/" className="font-serif font-bold text-xl text-primary hover:opacity-80 transition-opacity">
-            Admin Doce Glow
+            Admin Vitrinia
           </Link>
         </div>
         <nav className="flex-1 p-4 space-y-1">
