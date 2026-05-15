@@ -8,6 +8,7 @@ import { ChevronDown, ChevronRight, Phone, MapPin, Package, Clock, RefreshCw } f
 interface OrderItem {
   quantity: number;
   price_at_time: number;
+  selected_options?: { groupName: string; options: string[]; extra: number; priceMode: string }[] | null;
   products: { name: string } | null;
 }
 
@@ -271,14 +272,32 @@ export default function AdminOrders() {
                               <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Itens do pedido</p>
                               <div className="space-y-1.5">
                                 {order.order_items.map((item, idx) => (
-                                  <div key={idx} className="flex items-center justify-between text-sm">
-                                    <span className="text-slate-700">
-                                      <span className="font-medium text-primary">{item.quantity}x</span>{' '}
-                                      {item.products?.name || 'Produto removido'}
-                                    </span>
-                                    <span className="text-slate-500 font-medium">
-                                      R$ {(item.quantity * item.price_at_time).toFixed(2).replace('.', ',')}
-                                    </span>
+                                  <div key={idx} className="text-sm">
+                                    <div className="flex items-center justify-between">
+                                      <span className="text-slate-700">
+                                        <span className="font-medium text-primary">{item.quantity}x</span>{' '}
+                                        {item.products?.name || 'Produto removido'}
+                                      </span>
+                                      <span className="text-slate-500 font-medium">
+                                        R$ {(item.quantity * item.price_at_time).toFixed(2).replace('.', ',')}
+                                      </span>
+                                    </div>
+                                    {item.selected_options && item.selected_options.length > 0 && (
+                                      <div className="ml-5 mt-1 space-y-0.5 mb-1">
+                                        {item.selected_options.map((opt: any, oi: number) => (
+                                          <div key={oi} className="flex items-center gap-1.5 text-xs text-slate-500">
+                                            <span className="text-slate-300">↳</span>
+                                            <span className="text-slate-400">{opt.groupName}:</span>
+                                            <span className="font-medium text-slate-600">{opt.options?.join(', ')}</span>
+                                            {opt.extra > 0 && (
+                                              <span className="text-emerald-600">
+                                                ({opt.priceMode === 'replace' ? 'R$' : '+R$'} {Number(opt.extra).toFixed(2).replace('.', ',')})
+                                              </span>
+                                            )}
+                                          </div>
+                                        ))}
+                                      </div>
+                                    )}
                                   </div>
                                 ))}
                               </div>

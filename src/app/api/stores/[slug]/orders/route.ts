@@ -52,7 +52,8 @@ export async function POST(request: NextRequest, { params }: { params: Promise<{
         order_id: order.id,
         product_id: i.id,
         quantity: i.quantity,
-        price_at_time: i.price,
+        price_at_time: i.unitPrice || i.price,
+        selected_options: i.selectedOptions || null,
       }));
       await supabase.from('order_items').insert(orderItems);
 
@@ -90,7 +91,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const { data, error } = await getSupabaseAdmin()
       .from('orders')
-      .select('*, customers(id, name, phone, street, number, neighborhood, city, state), order_items(quantity, price_at_time, products(name))')
+      .select('*, customers(id, name, phone, street, number, neighborhood, city, state), order_items(quantity, price_at_time, selected_options, products(name))')
       .eq('store_id', store.id)
       .order('created_at', { ascending: false });
 
