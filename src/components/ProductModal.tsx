@@ -16,6 +16,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
   const [fullscreenImage, setFullscreenImage] = useState<string | null>(null);
   const [selections, setSelections] = useState<Record<string, Set<string>>>({});
   const [currentStep, setCurrentStep] = useState(0); // 0 = product info, 1+ = option groups
+  const [carouselIdx, setCarouselIdx] = useState(0);
 
   const hasOptions = product?.has_options && product.option_groups?.length;
   const totalSteps = hasOptions ? product.option_groups!.length : 0;
@@ -28,6 +29,7 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
       setSelections(initial);
     }
     setCurrentStep(0);
+    setCarouselIdx(0);
   }, [product]);
 
   // Prevent background scrolling
@@ -190,27 +192,47 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
             {/* ===== STEP 0: Product Info ===== */}
             {currentStep === 0 && (
               <div className="animate-in fade-in duration-200">
-                {/* Product Image */}
-                <div className="w-full h-56 sm:h-72 bg-slate-100 relative shrink-0">
-                  {product.images && product.images.length > 0 ? (
-                    <div className="w-full h-full flex overflow-x-auto snap-x snap-mandatory no-scrollbar">
-                      {product.images.map((img, idx) => (
-                        <img loading="lazy" key={idx} src={img} alt={`${product.name} ${idx + 1}`}
-                          className="w-full h-full object-cover shrink-0 snap-center cursor-zoom-in"
-                          onClick={() => setFullscreenImage(img)} />
-                      ))}
-                    </div>
+                {/* Product Image Carousel */}
+                <div className="w-full h-56 sm:h-72 bg-slate-100 relative shrink-0 group/carousel">
+                  {product.images && product.images.length > 1 ? (
+                    <>
+                      <div 
+                        className="w-full h-full flex transition-transform duration-300 ease-out"
+                        style={{ transform: `translateX(-${(carouselIdx) * 100}%)` }}
+                      >
+                        {product.images.map((img, idx) => (
+                          <img loading="lazy" key={idx} src={img} alt={`${product.name} ${idx + 1}`}
+                            className="w-full h-full object-cover shrink-0 cursor-zoom-in"
+                            onClick={() => setFullscreenImage(img)} />
+                        ))}
+                      </div>
+                      {/* Prev/Next Buttons */}
+                      {carouselIdx > 0 && (
+                        <button type="button" onClick={() => setCarouselIdx(i => i - 1)}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-slate-600 shadow-md opacity-0 group-hover/carousel:opacity-100 transition-opacity hover:bg-white">
+                          <ChevronLeft className="w-4 h-4" />
+                        </button>
+                      )}
+                      {carouselIdx < product.images.length - 1 && (
+                        <button type="button" onClick={() => setCarouselIdx(i => i + 1)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center text-slate-600 shadow-md opacity-0 group-hover/carousel:opacity-100 transition-opacity hover:bg-white">
+                          <ChevronRight className="w-4 h-4" />
+                        </button>
+                      )}
+                      {/* Dot Indicators */}
+                      <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5">
+                        {product.images.map((_, idx) => (
+                          <button key={idx} type="button" onClick={() => setCarouselIdx(idx)}
+                            className={`w-2 h-2 rounded-full transition-all duration-300 shadow-sm ${
+                              idx === carouselIdx ? 'bg-white w-5' : 'bg-white/50 hover:bg-white/70'
+                            }`} />
+                        ))}
+                      </div>
+                    </>
                   ) : (
                     <img loading="lazy" src={product.image_url} alt={product.name}
                       className="w-full h-full object-cover cursor-zoom-in"
                       onClick={() => setFullscreenImage(product.image_url)} />
-                  )}
-                  {product.images && product.images.length > 1 && (
-                    <div className="absolute bottom-3 left-0 right-0 flex justify-center gap-1.5 pointer-events-none">
-                      {product.images.map((_, idx) => (
-                        <div key={idx} className="w-2 h-2 rounded-full bg-white/70 shadow-sm" />
-                      ))}
-                    </div>
                   )}
                 </div>
 
