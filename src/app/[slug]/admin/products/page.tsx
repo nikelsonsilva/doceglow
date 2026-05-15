@@ -185,6 +185,7 @@ export default function AdminProducts() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!form.name || !form.priceDisplay) { toast.error('Preencha nome e preço'); return; }
+    if (modalStep < adminTotalSteps - 1) return; // safety guard
 
     // Validate option groups
     if (form.optionGroups.length > 0) {
@@ -209,6 +210,7 @@ export default function AdminProducts() {
         category: form.category,
         description: form.description || null,
         image_url: form.image_url || form.imageUrls[0] || '',
+        images: form.imageUrls.length > 0 ? form.imageUrls : null,
         active: form.active,
         stock: form.stockDisplay.trim() === '' ? null : parseInt(form.stockDisplay, 10),
         option_groups: cleanGroups.length > 0 ? cleanGroups : undefined,
@@ -371,8 +373,8 @@ export default function AdminProducts() {
               </div>
             </div>
 
-            {/* Scrollable step content */}
-            <form onSubmit={handleSubmit} className="flex-1 overflow-y-auto">
+            {/* Scrollable step content — noValidate prevents browser validation from interfering with wizard steps */}
+            <form onSubmit={handleSubmit} noValidate className="flex-1 overflow-y-auto">
               <div className="p-6 space-y-5">
                 {/* ====== STEP 0: Informações ====== */}
                 {modalStep === 0 && (
