@@ -344,9 +344,9 @@ export default function AdminProducts() {
 
       {/* ====== MODAL WIZARD ====== */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" onClick={() => setIsModalOpen(false)}>
-          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" />
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 max-h-[90vh] flex flex-col overflow-hidden" onClick={e => e.stopPropagation()}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsModalOpen(false)} />
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg relative z-10 max-h-[90vh] flex flex-col overflow-hidden">
             {/* Header with step progress */}
             <div className="bg-white border-b border-slate-100 px-6 py-4 rounded-t-2xl shrink-0">
               <div className="flex items-center justify-between mb-3">
@@ -374,7 +374,8 @@ export default function AdminProducts() {
             </div>
 
             {/* Scrollable step content — noValidate prevents browser validation from interfering with wizard steps */}
-            <form onSubmit={handleSubmit} noValidate className="flex-1 overflow-y-auto">
+            <form onSubmit={handleSubmit} noValidate className="flex-1 overflow-y-auto"
+              onKeyDown={(e) => { if (e.key === 'Enter' && modalStep < adminTotalSteps - 1) e.preventDefault(); }}>
               <div className="p-6 space-y-5">
                 {/* ====== STEP 0: Informações ====== */}
                 {modalStep === 0 && (
