@@ -109,10 +109,10 @@ export default function StorePage() {
 
   if (storeLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-dvh flex items-center justify-center bg-slate-50">
         <div className="text-center">
-          <div className="w-10 h-10 border-4 border-pink-200 border-t-pink-500 rounded-full animate-spin mx-auto mb-4" />
-          <p className="text-slate-400">Carregando loja...</p>
+          <div className="w-10 h-10 border-4 border-primary/20 border-t-primary rounded-full animate-spin mx-auto mb-4" />
+          <p className="text-slate-400 text-sm">Carregando loja...</p>
         </div>
       </div>
     );
@@ -120,26 +120,28 @@ export default function StorePage() {
 
   if (storeError || !store) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-dvh flex items-center justify-center bg-slate-50">
         <div className="text-center max-w-md px-6">
-          <div className="text-6xl mb-4">🏪</div>
-          <h1 className="text-2xl font-bold text-slate-800 mb-2">Loja não encontrada</h1>
-          <p className="text-slate-500 mb-6">Essa loja não existe ou foi desativada.</p>
-          <a href="/" className="text-primary font-medium hover:underline">← Voltar ao início</a>
+          <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <span className="text-3xl">🏪</span>
+          </div>
+          <h1 className="text-xl font-bold text-slate-800 mb-2">Loja não encontrada</h1>
+          <p className="text-slate-500 text-sm mb-6">Essa loja não existe ou foi desativada.</p>
+          <a href="/" className="text-primary font-semibold text-sm hover:underline">← Voltar ao início</a>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-full flex flex-col bg-slate-50 pb-20">
+    <div className="min-h-dvh flex flex-col bg-slate-50/80 pb-24">
       <Header 
         storeName={store.name} 
         onOpenOrders={() => setIsOrdersOpen(true)} 
         hasOrders={!!customerPhone} 
       />
       
-      <main className="flex-1 w-full max-w-4xl mx-auto flex flex-col">
+      <main className="flex-1 w-full max-w-lg mx-auto flex flex-col">
         <CategoryNav 
           categories={categories}
           activeCategory={activeCategory}
@@ -147,16 +149,31 @@ export default function StorePage() {
         />
         
         {loading ? (
-          <div className="flex items-center justify-center py-20 text-slate-400">
-            Carregando produtos...
+          <div className="p-4 grid grid-cols-2 gap-3">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-white rounded-2xl overflow-hidden border border-slate-100/80 animate-pulse">
+                <div className="aspect-square bg-slate-200" />
+                <div className="p-3 space-y-2">
+                  <div className="h-3 bg-slate-200 rounded-full w-3/4" />
+                  <div className="h-3 bg-slate-200 rounded-full w-1/2" />
+                  <div className="flex justify-between items-center mt-2">
+                    <div className="h-4 bg-slate-200 rounded-full w-20" />
+                    <div className="w-9 h-9 bg-slate-200 rounded-full" />
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : products.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-slate-400 gap-2">
-            <p className="text-lg">Nenhum produto cadastrado ainda.</p>
-            <p className="text-sm">Os produtos aparecerão aqui assim que forem cadastrados.</p>
+          <div className="flex flex-col items-center justify-center py-20 text-slate-400 gap-2 px-6 text-center">
+            <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center mb-2">
+              <span className="text-3xl">📦</span>
+            </div>
+            <p className="text-base font-medium text-slate-500">Nenhum produto cadastrado ainda.</p>
+            <p className="text-sm text-slate-400">Os produtos aparecerão aqui assim que forem cadastrados.</p>
           </div>
         ) : (
-          <div className="p-4 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+          <div className="p-3 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
             {filteredProducts.map(product => (
               <ProductCard 
                 key={product.id} 
@@ -165,7 +182,7 @@ export default function StorePage() {
               />
             ))}
             {filteredProducts.length === 0 && (
-              <div className="col-span-full py-12 text-center text-slate-500">
+              <div className="col-span-full py-12 text-center text-slate-500 text-sm">
                 Nenhum produto encontrado nesta categoria.
               </div>
             )}

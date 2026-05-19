@@ -266,28 +266,28 @@ export default function CheckoutModal({ isOpen, onClose, storeSlug, storeName, s
     onClose();
   };
 
-  const inputCls = "w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition";
-  const btnCls = "w-full bg-primary text-white py-4 rounded-full font-semibold flex items-center justify-center gap-2 hover:bg-primary-hover disabled:opacity-60 transition shadow-md shadow-pink-200";
+  const inputCls = "w-full px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition text-base";
+  const btnCls = "w-full bg-primary text-white py-4 rounded-2xl font-bold flex items-center justify-center gap-2 hover:brightness-110 disabled:opacity-50 transition-all shadow-lg shadow-primary/25 active:scale-[0.98] touch-manipulation text-[15px]";
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end sm:items-center justify-center p-0 sm:p-4">
-      <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm" onClick={onClose} />
-      <div className="bg-white w-full sm:max-w-md rounded-t-3xl sm:rounded-3xl shadow-2xl relative z-[61] flex flex-col max-h-[90vh] overflow-hidden animate-in slide-in-from-bottom-full sm:slide-in-from-bottom-8 duration-300">
+    <div className="fixed inset-0 z-[60] flex items-end justify-center">
+      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div className="bg-white w-full max-w-lg rounded-t-[28px] shadow-2xl relative z-[61] flex flex-col max-h-[90dvh] overflow-hidden animate-in slide-in-from-bottom-full duration-300">
 
         {/* Header */}
-        <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0">
-          <h2 className="font-serif text-xl font-bold text-slate-800">
+        <div className="px-5 py-3.5 border-b border-slate-100 flex items-center justify-between shrink-0">
+          <h2 className="font-serif text-lg font-bold text-slate-800">
             {step === 'phone' || step === 'otp' ? 'Identificação' :
              step === 'name' ? 'Seus Dados' :
              step === 'address' ? 'Endereço de Entrega' :
              step === 'review' ? 'Revise seu Pedido' :
              step === 'confirm-address' ? 'Confirme a Entrega' : 'Pagamento'}
           </h2>
-          <button onClick={onClose} className="p-2 -mr-2 text-slate-400 hover:text-slate-600 rounded-full transition-colors"><X className="w-5 h-5" /></button>
+          <button onClick={onClose} className="p-2 -mr-2 text-slate-400 hover:text-slate-600 rounded-full transition-colors touch-manipulation active:scale-90" aria-label="Fechar"><X className="w-5 h-5" /></button>
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto flex-1">
+        <div className="px-5 py-5 overflow-y-auto overscroll-contain flex-1">
 
           {/* ===== PHONE ===== */}
           {step === 'phone' && (

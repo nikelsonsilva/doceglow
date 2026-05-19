@@ -30,6 +30,15 @@ export const metadata: Metadata = {
   manifest: '/site.webmanifest',
 };
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  viewportFit: 'cover' as const,
+  interactiveWidget: 'resizes-content' as const,
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -40,7 +49,7 @@ export default function RootLayout({
       lang="pt-BR"
       className={cn("h-full", "antialiased", inter.variable, playfair.variable, "font-sans", geist.variable)}
     >
-      <body className="min-h-full flex flex-col font-sans bg-gray-50 text-slate-700">
+      <body className="min-h-dvh flex flex-col font-sans bg-slate-50 text-slate-700">
         {children}
         <Toaster position="top-center" toastOptions={{ className: 'font-sans' }} />
       </body>

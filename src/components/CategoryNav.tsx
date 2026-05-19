@@ -1,7 +1,6 @@
 'use client';
 
 import { useRef, useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface CategoryNavProps {
   categories: string[];
@@ -30,34 +29,39 @@ export default function CategoryNav({ categories, activeCategory, onSelectCatego
     return () => window.removeEventListener('resize', checkScroll);
   }, [categories]);
 
-  const scroll = (dir: 'left' | 'right') => {
+  // Auto-scroll to active category
+  useEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
-    el.scrollBy({ left: dir === 'left' ? -160 : 160, behavior: 'smooth' });
-    setTimeout(checkScroll, 300);
-  };
+    const activeBtn = el.querySelector(`[data-category="${activeCategory}"]`) as HTMLElement;
+    if (activeBtn) {
+      const scrollLeft = activeBtn.offsetLeft - el.offsetWidth / 2 + activeBtn.offsetWidth / 2;
+      el.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+    }
+  }, [activeCategory]);
 
   return (
-    <div className="w-full relative py-3 px-4 border-b border-slate-100 bg-white/95 backdrop-blur-md sticky top-16 z-30">
-      {/* Left arrow */}
+    <div className="w-full relative py-2.5 px-3 border-b border-slate-100/60 bg-white/95 backdrop-blur-md sticky top-14 z-30">
+      {/* Left fade */}
       {showLeft && (
-        <button onClick={() => scroll('left')}
-          className="absolute left-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white shadow-md border border-slate-200 flex items-center justify-center text-slate-600 hover:text-primary transition-colors">
-          <ChevronLeft className="w-4 h-4" />
-        </button>
+        <div className="absolute left-0 top-0 bottom-0 w-8 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
       )}
 
       {/* Scrollable tabs */}
-      <div ref={scrollRef} onScroll={checkScroll}
-        className="flex gap-2 overflow-x-auto no-scrollbar scroll-smooth px-1">
+      <div 
+        ref={scrollRef} 
+        onScroll={checkScroll}
+        className="flex gap-2 overflow-x-auto no-scrollbar scroll-smooth px-1 -webkit-overflow-scrolling-touch"
+      >
         {uniqueCategories.map((category) => (
           <button
             key={category}
+            data-category={category}
             onClick={() => onSelectCategory(category)}
-            className={`whitespace-nowrap px-4 py-2 rounded-full text-sm font-medium transition shrink-0 ${
+            className={`whitespace-nowrap px-4 py-2 rounded-full text-[13px] font-semibold transition-all duration-200 shrink-0 touch-manipulation active:scale-95 ${
               activeCategory === category
-                ? 'bg-primary text-white shadow-md shadow-pink-200'
-                : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                ? 'bg-primary text-white shadow-md shadow-primary/25'
+                : 'bg-slate-100/80 text-slate-500 hover:bg-slate-200/80 active:bg-slate-200'
             }`}
           >
             {category}
@@ -65,12 +69,9 @@ export default function CategoryNav({ categories, activeCategory, onSelectCatego
         ))}
       </div>
 
-      {/* Right arrow */}
+      {/* Right fade */}
       {showRight && (
-        <button onClick={() => scroll('right')}
-          className="absolute right-1 top-1/2 -translate-y-1/2 z-10 w-8 h-8 rounded-full bg-white shadow-md border border-slate-200 flex items-center justify-center text-slate-600 hover:text-primary transition-colors">
-          <ChevronRight className="w-4 h-4" />
-        </button>
+        <div className="absolute right-0 top-0 bottom-0 w-8 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
       )}
     </div>
   );

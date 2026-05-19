@@ -16,22 +16,22 @@ export default function FloatingCartBar({ onOpenCart }: FloatingCartBarProps) {
   const count = items.reduce((sum, i) => sum + i.quantity, 0);
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 px-4 pb-4 pointer-events-none">
-      <div className="max-w-md mx-auto pointer-events-auto">
+    <div className="fixed bottom-0 left-0 right-0 z-40 px-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] pointer-events-none">
+      <div className="max-w-lg mx-auto pointer-events-auto">
         <button
           onClick={onOpenCart}
-          className="w-full bg-primary hover:bg-primary-hover text-white rounded-2xl px-5 py-4 flex items-center justify-between shadow-xl shadow-pink-200/50 transition active:scale-[0.98]"
+          className="w-full bg-primary text-white rounded-2xl px-5 py-4 flex items-center justify-between shadow-xl shadow-primary/30 transition-all active:scale-[0.98] touch-manipulation hover:brightness-110"
         >
           <div className="flex items-center gap-3">
             <div className="relative">
               <ShoppingBag className="w-6 h-6" />
-              <span className="absolute -top-2 -right-2 w-5 h-5 bg-white text-primary text-xs font-bold rounded-full flex items-center justify-center shadow-sm">
+              <span className="absolute -top-2 -right-2.5 w-5 h-5 bg-white text-primary text-[11px] font-bold rounded-full flex items-center justify-center shadow-sm tabular-nums">
                 {count}
               </span>
             </div>
             <span className="font-semibold text-sm">Ver Carrinho</span>
           </div>
-          <span className="font-bold text-lg">
+          <span className="font-bold text-lg tabular-nums">
             R$ {total.toFixed(2).replace('.', ',')}
           </span>
         </button>
