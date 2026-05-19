@@ -15,7 +15,7 @@ export default function Header({ storeName, onOpenOrders, hasOrders }: HeaderPro
 
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-lg border-b border-slate-100/80 supports-[backdrop-filter]:bg-white/80">
-      <div className="w-full max-w-lg mx-auto px-4 h-14 flex items-center justify-between">
+      <div className="w-full max-w-4xl mx-auto px-4 h-14 flex items-center justify-between">
         {/* Left spacer or orders button */}
         <div className="w-10 flex items-center justify-start">
           {hasOrders && onOpenOrders && (
@@ -31,7 +31,7 @@ export default function Header({ storeName, onOpenOrders, hasOrders }: HeaderPro
         </div>
         
         {/* Store name */}
-        <h1 className="font-serif text-xl font-bold text-primary tracking-tight truncate max-w-[180px] text-center">
+        <h1 className="font-serif text-xl font-bold text-primary tracking-tight truncate max-w-[280px] sm:max-w-md text-center">
           {storeName || 'Vitrinia'}
         </h1>
         

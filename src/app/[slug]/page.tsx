@@ -141,7 +141,7 @@ export default function StorePage() {
         hasOrders={!!customerPhone} 
       />
       
-      <main className="flex-1 w-full max-w-lg mx-auto flex flex-col">
+      <main className="flex-1 w-full max-w-4xl mx-auto flex flex-col">
         <CategoryNav 
           categories={categories}
           activeCategory={activeCategory}

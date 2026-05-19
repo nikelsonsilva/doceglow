@@ -52,13 +52,17 @@ function calcUnitPrice(product: Product, selectedOptions?: SelectedOption[]): nu
   if (!selectedOptions?.length) return product.price;
   
   let basePrice = product.price;
+  let baseReplaced = false;
   let addTotal = 0;
 
   for (const sel of selectedOptions) {
-    if (sel.priceMode === 'replace' && sel.extra > 0) {
-      basePrice = sel.extra; // Replace base price
+    if (sel.extra === 0) continue; // no price impact
+    
+    if (sel.priceMode === 'replace' && !baseReplaced) {
+      basePrice = sel.extra; // Replace base price (only once)
+      baseReplaced = true;
     } else {
-      addTotal += sel.extra;
+      addTotal += sel.extra; // All subsequent extras are additive
     }
   }
 

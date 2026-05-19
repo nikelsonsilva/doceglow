@@ -103,9 +103,13 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
   if (!isOpen || !product) return null;
 
   // Calculate total price with options
+  // Logic: first 'replace' group with extra_price > 0 sets the base price.
+  // Subsequent groups (replace or add) with extra_price > 0 ADD to the total.
+  // Replace groups with extra_price = 0 are informational (no price impact).
   const calcPrice = () => {
     if (!hasOptions) return product.price;
     let base = product.price;
+    let baseReplaced = false;
     let addTotal = 0;
 
     for (const group of product.option_groups!) {
@@ -114,10 +118,14 @@ export default function ProductModal({ product, isOpen, onClose }: ProductModalP
 
       for (const opt of group.product_options) {
         if (selected.has(opt.id)) {
-          if (group.price_mode === 'replace') {
-            base = Number(opt.extra_price);
+          const price = Number(opt.extra_price);
+          if (price === 0) continue; // no price impact
+
+          if (group.price_mode === 'replace' && !baseReplaced) {
+            base = price;
+            baseReplaced = true;
           } else {
-            addTotal += Number(opt.extra_price);
+            addTotal += price;
           }
         }
       }
